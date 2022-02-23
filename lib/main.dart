@@ -4,6 +4,9 @@ void main() {
   runApp(const MyApp());
 }
 //hello world
+// Abrakadabra mrkp prk brk
+// Pise da penzz treba SDK novu verziju
+// Nema veze sredio sam
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
