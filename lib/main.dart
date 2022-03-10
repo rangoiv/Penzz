@@ -5,7 +5,14 @@ import 'package:flutter/material.dart';
 
 import 'pages/takingPicturePage.dart';
 
-Future<void> main() async {
+import 'package:penzz/pages/welcome_screen.dart';
+import 'package:penzz/pages/after_login_screen.dart';
+import 'package:penzz/pages/registration_screen.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+/*Future<void> main() async {
   // Ensure that plugin services are initialized so that `availableCameras()`
   // can be called before `runApp()`
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,10 +26,40 @@ Future<void> main() async {
   runApp(
     MaterialApp(
       theme: ThemeData.dark(),
-      home: TakePictureScreen(
+      home: //TakePictureScreen(
         // Pass the appropriate camera to the TakePictureScreen widget.
-        camera: firstCamera,
+       // camera: firstCamera,
+       WelcomeScreen()
       ),
     ),
   );
+}
+*/
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp();
+  //initilization of Firebase app
+
+  // other Firebase service initialization
+
+  runApp(FlashChat());
+}
+
+//void main() => runApp(FlashChat());
+
+class FlashChat extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+
+        initialRoute: WelcomeScreen.id,
+        routes: {
+          WelcomeScreen.id: (context) => WelcomeScreen(),
+          AfterLoginScreen.id: (context) => AfterLoginScreen(),
+          RegistrationScreen.id: (context) => RegistrationScreen(),
+
+        }
+    );
+  }
 }

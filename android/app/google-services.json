@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "635752537912",
+    "project_id": "penzz-343408",
+    "storage_bucket": "penzz-343408.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:635752537912:android:598e4d01b9953fb4976bcd",
+        "android_client_info": {
+          "package_name": "com.lumeni.penzz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "635752537912-dguoqrst7qn8aevqv05741dfbg3oq7j7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZItUMuWDCQuCLhK0I1muNLnr_sXZMszQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "635752537912-dguoqrst7qn8aevqv05741dfbg3oq7j7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
