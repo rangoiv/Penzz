@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import'package:firebase_core/firebase_core.dart';
-
+import 'scan_document_screen.dart';
 
 
 class AfterLoginScreen extends StatefulWidget {
   static const String id = 'after_login_screen';
 
-@override
-_AfterLoginScreenState createState() => _AfterLoginScreenState();
+  @override
+  _AfterLoginScreenState createState() => _AfterLoginScreenState();
 }
 
 class _AfterLoginScreenState extends State<AfterLoginScreen> {
@@ -20,6 +20,10 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
     super.initState();
 
     getCurrentUser();
+  }
+
+  void scanDocument() async {
+    Navigator.pushNamed(context, ScanDocumentScreen.id);
   }
 
   void getCurrentUser() async {
@@ -40,14 +44,13 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Row(
-              children: <Widget>[
-
+              children: const <Widget>[
                 Text(
                   'Odaberi radnju:',
                   style: TextStyle(
@@ -58,7 +61,7 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
               ],
             ),
 
-            SizedBox(
+            const SizedBox(
               height: 48.0,
             ),
 
@@ -76,7 +79,7 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
                   },
                   minWidth: 200.0,
                   height: 42.0,
-                  child: Text(
+                  child: const Text(
                     'Logout',
                     style: TextStyle(
                       color: Colors.white,
@@ -85,8 +88,13 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
                 ),
               ),
             ),
-            ]
-    ),
+          ]
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: scanDocument,
+        tooltip: 'Scan document',
+        child: Icon(Icons.add),
       ),
     );
   }
