@@ -96,7 +96,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       }
                     }
                     catch (e) {
-                      print(e);
+                      showAlertDialog(context);
                     }
                   }, // Image tapped
                   child: Image.asset(
@@ -135,7 +135,33 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 }
+showAlertDialog(BuildContext context) {
 
+  // set up the button
+  Widget okButton = TextButton(
+    child: Text("OK", style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold)),
+    onPressed: () {
+      Navigator.pop(context);
+    },
+  );
+
+  // set up the AlertDialog
+  AlertDialog alert = AlertDialog(
+    title: Text("Upozorenje"),
+    content: Text("Prvo napravi račun ako nisi ili se ulogiraj sa svojim e-mailom!", style: TextStyle(fontFamily: 'NotoSans'),),
+    actions: [
+      okButton,
+    ],
+  );
+
+  // show the dialog
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
+}
 
 
 
