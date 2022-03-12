@@ -14,6 +14,7 @@ class AfterLoginScreen extends StatefulWidget {
 class _AfterLoginScreenState extends State<AfterLoginScreen> {
   final _auth = FirebaseAuth.instance;
   late User loggedInUser;
+  String marko = 'Odaberi radnju...';
 
   @override
   void initState() {
@@ -32,6 +33,12 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
       if (user != null) {
         loggedInUser = user;
         print(loggedInUser.email);
+        marko = loggedInUser.email!;
+        setState(() {
+
+        });
+
+
       }
     }
     catch (e) {
@@ -50,11 +57,11 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Row(
-              children: const <Widget>[
+              children:  <Widget>[
                 Text(
-                  'Odaberi radnju:',
+                  marko,
                   style: TextStyle(
-                    fontSize: 30.0,
+                    fontSize: 10.0,
                     fontWeight: FontWeight.w900,
                   ),
                 ),

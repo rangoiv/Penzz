@@ -11,6 +11,7 @@ import 'package:penzz/pages/registration_screen.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'penzzTheme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,14 +21,15 @@ void main() async {
 
   // other Firebase service initialization
 
-  runApp(FlashChat());
+  runApp(Penzz());
 }
 
-class FlashChat extends StatelessWidget {
+class Penzz extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
+      theme: CustomTheme.penzzTheme,
+        home: WelcomeScreen(),
         initialRoute: WelcomeScreen.id,
         routes: {
           WelcomeScreen.id: (context) => WelcomeScreen(),

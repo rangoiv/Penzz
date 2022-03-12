@@ -42,6 +42,7 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
       ResolutionPreset.medium,
     );
     await _controller.initialize();
+    await Future.delayed(const Duration(milliseconds: 2500), () {});
   }
 
   @override
@@ -63,7 +64,11 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             // If the Future is complete, display the preview.
-            return CameraPreview(_controller);
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+              CameraPreview(_controller),
+            ]);
           } else {
             // Otherwise, display a loading indicator.
             return const Center(child: CircularProgressIndicator());
