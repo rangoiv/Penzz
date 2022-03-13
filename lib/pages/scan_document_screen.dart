@@ -12,16 +12,21 @@ import '../filter_image.dart';
 // A screen that allows users to take a picture using a given camera.
 class ScanDocumentScreen extends StatefulWidget {
   static const String id = 'scan_document_screen';
+  final bool launchedFromDisplayDocument;
 
-  const ScanDocumentScreen({Key? key}) : super(key: key);
+  const ScanDocumentScreen({Key? key, this.launchedFromDisplayDocument = false}) : super(key: key);
 
   @override
-  ScanDocumentScreenState createState() => ScanDocumentScreenState();
+  ScanDocumentScreenState createState() => ScanDocumentScreenState(launchedFromDisplayDocument: launchedFromDisplayDocument);
 }
 
 class ScanDocumentScreenState extends State<ScanDocumentScreen> {
   late CameraController _controller;
   late Future<void> _initializeCamera;
+  final bool launchedFromDisplayDocument;
+  List<String> editedImages = [];
+
+  ScanDocumentScreenState({required this.launchedFromDisplayDocument});
 
   @override
   void initState() {
@@ -29,7 +34,7 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
     _initializeCamera = _initializeCameraFunc();
   }
 
-  Future<void> _initializeCameraFunc() async{
+  Future<void> _initializeCameraFunc() async {
     // Ensure that plugin services are initialized so that `availableCameras()`
     // can be called before `runApp()`
     WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +47,6 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
       ResolutionPreset.medium,
     );
     await _controller.initialize();
-    await Future.delayed(const Duration(milliseconds: 2500), () {});
   }
 
   @override
@@ -65,19 +69,36 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
           if (snapshot.connectionState == ConnectionState.done) {
             // If the Future is complete, display the preview.
             return Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-              CameraPreview(_controller),
-            ]);
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                SizedBox(height: 15,),
+                CameraPreview(_controller),
+              ]
+            );
           } else {
             // Otherwise, display a loading indicator.
             return const Center(child: CircularProgressIndicator());
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: takePicture,
-        child: const Icon(Icons.camera_alt),
+      floatingActionButton: Wrap(
+        direction: Axis.vertical,
+        children: <Widget>[
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            child: FloatingActionButton(
+              onPressed: done,
+              child: const Icon(Icons.check),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(10),
+            child: FloatingActionButton(
+              onPressed: takePicture,
+              child: const Icon(Icons.camera_alt),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -98,41 +119,89 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
       // Enhance the image to make it look like pdf
       File editedImage = await(editImage(File(image.path)));
 
-      // TODO: Add more pages to the document
-
-      // TODO: Save the document
-
-      // If the picture was taken, display it on a new screen.
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => DisplayPictureScreen(
-            // Pass the automatically generated path to
-            // the DisplayPictureScreen widget.
-            imagePath: editedImage.path,
-          ),
-        ),
-      );
+      editedImages.add(editedImage.path);
     } catch (e) {
       // If an error occurs, log the error to the console.
       print(e);
     }
   }
+
+  Future<void> done() async {
+    // Display the images just taken
+    if (launchedFromDisplayDocument) {
+      Navigator.pop(context, editedImages);
+      return;
+    }
+    await Navigator.popAndPushNamed(
+        context,
+        DisplayDocumentScreen.id,
+        arguments: editedImages,
+    );
+  }
 }
 
-// A widget that displays the picture taken by the user.
-class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
+class DisplayDocumentScreen extends StatefulWidget {
+  static const String id = 'display_document_screen';
 
-  const DisplayPictureScreen({Key? key, required this.imagePath})
-      : super(key: key);
+  const DisplayDocumentScreen({Key? key}) : super(key: key);
+
+  @override
+  State<DisplayDocumentScreen> createState() => _DisplayDocumentScreenState();
+}
+
+class _DisplayDocumentScreenState extends State<DisplayDocumentScreen> {
+  late String documentPath;
+  List<String> editedImages = [];
+  bool firstBuild = true;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    // get routes of scanned images from context when building the first time
+    if (firstBuild) {
+      var newEditedImages = ModalRoute.of(context)!.settings.arguments as List<String>;
+      editedImages += newEditedImages;
+      firstBuild = false;
+    }
     return Scaffold(
-      appBar: AppBar(title: const Text('Display the Picture')),
+      appBar: AppBar(title: const Text('Your new document')),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Image.file(File(imagePath)),
+      body: ListView.builder(
+        itemCount: editedImages.length,
+        itemBuilder: (context, index) {
+          final imagePath = editedImages[index];
+
+          return ListTile(
+            title: Text("Image " + (index+1).toString() + ":", textAlign: TextAlign.center, textScaleFactor: 1.3,),
+            subtitle: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 70),
+              child: Image.file(
+                File(imagePath),
+              ),
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: addImage,
+        child: const Icon(Icons.add),
+      ),
     );
+  }
+
+  void addImage() async {
+    // open window for scanning images and get their routes
+    final newEditedImages = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ScanDocumentScreen(launchedFromDisplayDocument: true),
+      ),
+    );
+    setState(() { editedImages += newEditedImages; });
   }
 }

@@ -36,6 +36,7 @@ class Penzz extends StatelessWidget {
           AfterLoginScreen.id: (context) => AfterLoginScreen(),
           RegistrationScreen.id: (context) => RegistrationScreen(),
           ScanDocumentScreen.id: (context) => ScanDocumentScreen(),
+          DisplayDocumentScreen.id: (context) => DisplayDocumentScreen(),
         }
     );
   }
