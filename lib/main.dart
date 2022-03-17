@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'pages/scan_document_screen.dart';
 
 import 'package:penzz/pages/welcome_screen.dart';
@@ -15,6 +15,7 @@ import 'penzzTheme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.removeAfter(initialization);
 
   await Firebase.initializeApp();
   //initilization of Firebase app
@@ -23,7 +24,9 @@ void main() async {
 
   runApp(Penzz());
 }
-
+Future initialization (BuildContext? context) async {
+  await Future.delayed(Duration(seconds: 1));
+}
 class Penzz extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

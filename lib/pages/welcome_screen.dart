@@ -36,7 +36,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              SizedBox(height: 60,),
+              SizedBox(height: 88,),
               Row(
                 children: <Widget>[
                   Text(
@@ -65,7 +65,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
               ),
               SizedBox(
-                height: 18.0,
+                height: 24.0,
               ),
               Material(
                 color: Color(0XFFECF0F3),
@@ -85,26 +85,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 height: 24.0,
               ),
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 1.0),
-                child: GestureDetector(
-                  onTap: () async {
-                    try {
-                      final user = await _auth.signInWithEmailAndPassword(
-                          email: email, password: password);
-                      if (user != null) {
-                        Navigator.pushNamed(context, AfterLoginScreen.id);
-                      }
-                    }
-                    catch (e) {
-                      showAlertDialog(context);
-                    }
-                  }, // Image tapped
-                  child: Image.asset(
-                    'images/loginBtn.png',
-                    width: 160.0,
-                    height: 160.0,
-                  ),
-                ),
+                padding: EdgeInsets.only(top: 1, left: 100, right: 98),
+                child: IconButton(constraints: BoxConstraints.expand(height: 180, width: 180),
+
+                  icon: Image.asset('images/loginBtn.png'),
+                  onPressed:  () async {
+    try {
+    final user = await _auth.signInWithEmailAndPassword(
+    email: email, password: password);
+    if (user != null) {
+    Navigator.pushNamed(context, AfterLoginScreen.id);
+    }
+    }
+    catch (e) {
+    showAlertDialog(context);
+    }},
+                  iconSize: 66,
+                  splashColor:  Colors.cyan,
+                  visualDensity: VisualDensity.comfortable,
+                )
               ),
               SizedBox(height: 10,),
               Material(
