@@ -18,3 +18,5 @@ const kTextFieldDecoration = InputDecoration(
     borderRadius: BorderRadius.all(Radius.circular(32.0)),
   ),
 );
+
+const kDocumentTypes = <String> ["Uputnica", "Covid potvrda", "Otpusno pismo"];

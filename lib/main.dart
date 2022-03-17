@@ -1,13 +1,15 @@
 import 'dart:async';
 
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'pages/scan_document_screen.dart';
 
 import 'package:penzz/pages/welcome_screen.dart';
 import 'package:penzz/pages/after_login_screen.dart';
 import 'package:penzz/pages/registration_screen.dart';
+import 'package:penzz/pages/scan_document_screen.dart';
+import 'package:penzz/pages/save_document_screen.dart';
+import 'package:penzz/pages/display_documents_screen.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -39,7 +41,8 @@ class Penzz extends StatelessWidget {
           AfterLoginScreen.id: (context) => AfterLoginScreen(),
           RegistrationScreen.id: (context) => RegistrationScreen(),
           ScanDocumentScreen.id: (context) => ScanDocumentScreen(),
-          DisplayDocumentScreen.id: (context) => DisplayDocumentScreen(),
+          SaveDocumentScreen.id: (context) => SaveDocumentScreen(),
+          DisplayDocumentsScreen.id: (context) => DisplayDocumentsScreen(),
         }
     );
   }

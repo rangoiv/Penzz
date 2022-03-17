@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'scan_document_screen.dart';
+import 'display_documents_screen.dart';
 
 
 class AfterLoginScreen extends StatefulWidget {
@@ -23,10 +24,6 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
     getCurrentUser();
   }
 
-  void scanDocument() async {
-    Navigator.pushNamed(context, ScanDocumentScreen.id);
-  }
-
   void getCurrentUser() async {
     try {
       final user = await _auth.currentUser;
@@ -37,8 +34,6 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
         setState(() {
 
         });
-
-
       }
     }
     catch (e) {
@@ -81,6 +76,27 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
                 elevation: 5.0,
                 child: MaterialButton(
                   onPressed: ()  {
+                    Navigator.pushNamed(context, DisplayDocumentsScreen.id);
+                  },
+                  minWidth: 200.0,
+                  height: 42.0,
+                  child: const Text(
+                    'Dokumenti',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.0),
+              child: Material(
+                color: Colors.lightBlueAccent,
+                borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                elevation: 5.0,
+                child: MaterialButton(
+                  onPressed: ()  {
                     _auth.signOut();
                     Navigator.pop(context);
                   },
@@ -97,11 +113,6 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
             ),
           ]
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: scanDocument,
-        tooltip: 'Scan document',
-        child: Icon(Icons.add),
       ),
     );
   }

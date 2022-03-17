@@ -7,7 +7,8 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-import '../filter_image.dart';
+import 'package:penzz/filter_image.dart';
+import 'package:penzz/pages/save_document_screen.dart';
 
 // A screen that allows users to take a picture using a given camera.
 class ScanDocumentScreen extends StatefulWidget {
@@ -58,47 +59,52 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Take a picture')),
-      // You must wait until the controller is initialized before displaying the
-      // camera preview. Use a FutureBuilder to display a loading spinner until the
-      // controller has finished initializing.
-      body: FutureBuilder<void>(
-        future: _initializeCamera,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            // If the Future is complete, display the preview.
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(height: 15,),
-                CameraPreview(_controller),
-              ]
-            );
-          } else {
-            // Otherwise, display a loading indicator.
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
-      floatingActionButton: Wrap(
-        direction: Axis.vertical,
-        children: <Widget>[
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: FloatingActionButton(
-              onPressed: done,
-              child: const Icon(Icons.check),
+    return WillPopScope(
+      onWillPop: goBack,
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Take a picture')),
+        // You must wait until the controller is initialized before displaying the
+        // camera preview. Use a FutureBuilder to display a loading spinner until the
+        // controller has finished initializing.
+        body: FutureBuilder<void>(
+          future: _initializeCamera,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              // If the Future is complete, display the preview.
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(height: 15,),
+                  CameraPreview(_controller),
+                ]
+              );
+            } else {
+              // Otherwise, display a loading indicator.
+              return const Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
+        floatingActionButton: Wrap(
+          direction: Axis.vertical,
+          children: <Widget>[
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: FloatingActionButton(
+                heroTag: "doneFloatingButton",
+                onPressed: done,
+                child: const Icon(Icons.check),
+              ),
             ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(10),
-            child: FloatingActionButton(
-              onPressed: takePicture,
-              child: const Icon(Icons.camera_alt),
+            Container(
+              margin: const EdgeInsets.all(10),
+              child: FloatingActionButton(
+                heroTag: "takePictureFloatingButton",
+                onPressed: takePicture,
+                child: const Icon(Icons.camera_alt),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -126,82 +132,27 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
     }
   }
 
+  Future<bool> goBack() async {
+    if (launchedFromDisplayDocument) {
+      return true;
+    }
+    Navigator.pop(context, []);
+    return true;
+  }
+
   Future<void> done() async {
     // Display the images just taken
     if (launchedFromDisplayDocument) {
       Navigator.pop(context, editedImages);
       return;
     }
-    await Navigator.popAndPushNamed(
+    await Navigator.pushReplacementNamed(
         context,
-        DisplayDocumentScreen.id,
+        SaveDocumentScreen.id,
         arguments: editedImages,
     );
   }
 }
 
-class DisplayDocumentScreen extends StatefulWidget {
-  static const String id = 'display_document_screen';
 
-  const DisplayDocumentScreen({Key? key}) : super(key: key);
 
-  @override
-  State<DisplayDocumentScreen> createState() => _DisplayDocumentScreenState();
-}
-
-class _DisplayDocumentScreenState extends State<DisplayDocumentScreen> {
-  late String documentPath;
-  List<String> editedImages = [];
-  bool firstBuild = true;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // get routes of scanned images from context when building the first time
-    if (firstBuild) {
-      var newEditedImages = ModalRoute.of(context)!.settings.arguments as List<String>;
-      editedImages += newEditedImages;
-      firstBuild = false;
-    }
-    return Scaffold(
-      appBar: AppBar(title: const Text('Your new document')),
-      // The image is stored as a file on the device. Use the `Image.file`
-      // constructor with the given path to display the image.
-      body: ListView.builder(
-        itemCount: editedImages.length,
-        itemBuilder: (context, index) {
-          final imagePath = editedImages[index];
-
-          return ListTile(
-            title: Text("Image " + (index+1).toString() + ":", textAlign: TextAlign.center, textScaleFactor: 1.3,),
-            subtitle: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 70),
-              child: Image.file(
-                File(imagePath),
-              ),
-            ),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: addImage,
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  void addImage() async {
-    // open window for scanning images and get their routes
-    final newEditedImages = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const ScanDocumentScreen(launchedFromDisplayDocument: true),
-      ),
-    );
-    setState(() { editedImages += newEditedImages; });
-  }
-}
