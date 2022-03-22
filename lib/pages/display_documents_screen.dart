@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:penzz/documents_database.dart';
 import 'package:penzz/storage.dart';
 import 'package:penzz/pages/scan_document_screen.dart';
 
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:share_plus/share_plus.dart';
 
 class DisplayDocumentsScreen extends StatefulWidget {
   static const String id = 'display_documents_screen';
@@ -12,8 +17,6 @@ class DisplayDocumentsScreen extends StatefulWidget {
 }
 
 class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
-  List<Document> _documents = [];
-
   @override
   void initState() {
     super.initState();
@@ -21,35 +24,18 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
     _begin();
   }
 
+  @override
+  void dispose() {
+    Documents.close();
+    super.dispose();
+  }
+
   void _begin() async {
+    //await Documents.deleteDatabase();
     await Storage.loadUser();
     await Documents.loadDatabase();
 
-    await Documents.insertDocument(Document(
-        id: 1,
-        name: "Prvi",
-        date: DateTime.now(),
-        type: "Uputnica",
-    ));
-    await Documents.insertDocument(Document(
-      id: 2,
-      name: "Drugi dokument",
-      date: DateTime.now(),
-      type: "Uputnica",
-    ));
-    await Documents.insertDocument(Document(
-      id: 3,
-      name: "Treći dokument",
-      date: DateTime(0),
-      type: "Uputnica",
-    ));
-    _documents = await Documents.documents();
     setState(() {});
-  }
-
-  void _scanDocument() async {
-    // TODO: Nakon skeniranja se ne učita novi dokument
-    Navigator.pushNamed(context, ScanDocumentScreen.id);
   }
 
   @override
@@ -64,19 +50,24 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               const SizedBox(height: 30,),
-              ListView.builder(
-                physics: const ScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: _documents.length,
-                itemBuilder: (context, index) {
-                  final document = _documents[index];
 
-                  return ListTile(
-                    title: Text("Dokument " + (index+1).toString() + ":", textAlign: TextAlign.center, textScaleFactor: 1.3,),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-                      child: Text(document.type + " / " + document.name),
-                    ),
+              FutureBuilder<List<Document>>(
+                future: Documents.documents(),
+
+                builder: (context, snapshot) {
+                  List<Document> documents = [];
+                  if (snapshot.hasData) {
+                    documents = snapshot.data!;
+                  }
+                  return ListView.builder(
+                    physics: const ScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: documents.length,
+                    itemBuilder: (context, index) {
+                      final document = documents[index];
+
+                      return DocumentWidget(document: document, index: index,);
+                    },
                   );
                 },
               ),
@@ -88,6 +79,73 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
         tooltip: 'Scan document',
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  void _scanDocument() async {
+    Navigator.pushNamed(context, ScanDocumentScreen.id);
+  }
+}
+
+class DocumentWidget extends StatelessWidget {
+  const DocumentWidget({
+    Key? key,
+    required this.document,
+    required this.index
+  }) : super(key: key);
+
+  final Document document;
+  final int index;
+
+  Future<File> getDocument() async {
+    File file = await Storage.getDocumentFile(document.id, document.name);
+    return file;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text("Dokument " + (index+1).toString() + ":", textAlign: TextAlign.center, textScaleFactor: 1.3,),
+      subtitle: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(document.name),
+            ElevatedButton(
+              onPressed: () => _onShare(context),
+              child: const Text('Share'),
+            )
+          ],
+        ),
+      ),
+    );
+
+    /*
+    return FutureBuilder<File> (
+      future: getDocument(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          File file = snapshot.data!;
+
+
+        }
+        return ListTile(
+          title: Text("Dokument " + (index+1).toString() + ":", textAlign: TextAlign.center, textScaleFactor: 1.3,),
+        );
+      },
+    );
+    */
+  }
+
+  void _onShare(BuildContext context) async {
+    final box = context.findRenderObject() as RenderBox?;
+
+    await Share.shareFiles(
+        [(await Storage.getDocumentFile(document.id, document.name)).path],
+        text: "moj tekst",
+        subject: document.name,
+        //sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     );
   }
 }

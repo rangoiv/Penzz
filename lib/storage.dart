@@ -1,21 +1,23 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:path/path.dart' as Path;
 import 'package:path_provider/path_provider.dart';
 
 class Storage {
   static Future<void> _userCreated = _createUserFolders();
+  static final _auth = FirebaseAuth.instance;
 
   static Future<void> loadUser() async {
     _userCreated = _createUserFolders();
     await _userCreated;
   }
 
-  static Future <String> getUserDatabasesDirectory() async {
+  static Future<String> getUserDatabasesDirectory() async {
     await _userCreated;
     return _getUserDatabasesDirectory();
   }
-  static Future <String> getUserDocumentsDirectory() async {
+  static Future<String> getUserDocumentsDirectory() async {
     await _userCreated;
     return _getUserDocumentsDirectory();
   }
@@ -26,6 +28,33 @@ class Storage {
   static Future<String> getUserDirectory() async {
     await _userCreated;
     return _getUserDirectory();
+  }
+
+  static Future<File> getDocumentFile(int id, String name) async {
+    await _userCreated;
+
+    // Create document folder in documents directory
+    String documentDirPath = Path.join(await _getUserDocumentsDirectory(), id.toString());
+    var documentDir = Directory(documentDirPath);
+    await _createFolder(documentDir);
+
+    // Create the document
+    String filePath = Path.join(documentDirPath, name)+'.pdf';
+    File file = File(filePath);
+
+    return file;
+  }
+  static Future<String> _getCurrentUserUid() async {
+    try {
+      final user = await _auth.currentUser;
+      if (user != null) {
+        return user.uid;
+      }
+    }
+    catch (e) {
+      print(e);
+    }
+    return "";
   }
 
   static Future<String> _getUserDatabasesDirectory() async {
@@ -41,7 +70,7 @@ class Storage {
     Directory appDocumentsDirectory = await getApplicationDocumentsDirectory();
     String appDocumentsPath = appDocumentsDirectory.path;
     // TODO: Dodati UUID preko pravog korisnika
-    var userName = "mojKorisnik";
+    var userName = await _getCurrentUserUid();
     var dirPath = Path.join(appDocumentsPath, "users", userName);
     return dirPath;
   }

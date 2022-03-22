@@ -149,7 +149,7 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
   }
 
   Future<void> _saveDocument() async {
-    // Assemble the document
+    print("Creating pdf document.");
     final pdf = pw.Document();
 
     for (var imagePath in _editedImages) {
@@ -165,20 +165,16 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
           }));
     }
 
-    // TODO: Spremiti na pravu lokaciju
-    var documentPath = await Storage.getFilePath("example.pdf");
-    print("Saving document on path: \n" + documentPath);
-
-    final file = File(documentPath);
-    await file.writeAsBytes(await pdf.save());
-    print("Document saved!");
-
-    // TODO: Spremiti u bazu s ispravnim id
-    await Documents.insertDocument(Document(
-      id: 4,
-      name: "Moj dokument",
+    Document document = Document(
+      id: await Documents.getNewId(),
       date: DateTime.now(),
       type: _documentType,
-    ));
+    );
+
+    final file = await Storage.getDocumentFile(document.id, document.name);
+    print("Saving document on path: \n" + file.path);
+    await file.writeAsBytes(await pdf.save());
+
+    await Documents.insertDocument(document);
   }
 }
