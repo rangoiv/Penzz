@@ -1,4 +1,4 @@
-
+import 'dart:io';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -11,6 +11,7 @@ import 'package:sqflite/sqflite.dart';
 class Sugar {
   static late Future<Database> database;
   static final _tableName = 'Sugar';
+  static const _databaseName='sugar_database.db';
 
   static Future<void> loadDatabase() async {
     database = _createDatabase();
@@ -43,12 +44,59 @@ class Sugar {
     return database;
   }
 
+  static Future<void> close() async {
+    print("Closing blood sugar database");
+    final db = await database;
+    await db.close();
+  }
+
+  static Future<void> deleteDatabase() async {
+    try {
+      var path = join(await Storage.getUserDatabasesDirectory(), _databaseName);
+      print("Deleting database - " + path);
+      final file = File(path);
+
+      await file.delete();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<int> getNewId() async {
+    final db = await database;
+
+    // Get the highest id currently used in database
+    print("Getting new id");
+    var res = await db.query(_tableName, columns: ["MAX(id)"]);
+    var newId = res[0]["MAX(id)"];
+
+    if (newId == null) {
+      return 100000;
+    }
+    int newIdInt = int.parse(newId.toString()) + 1;
+    return newIdInt;
+  }
+
   static Future<void> insert(Sug object) async {
     print("Inserting - " + object.toString());
     final db = await database;
 
     await db.insert(
       'Sugar', object.toMap(), conflictAlgorithm: ConflictAlgorithm.replace,);
+  }
+
+  static Future<List<Sug>> queryAll() async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> maps = await db.query(_tableName);
+
+    return List.generate(maps.length, (i) {
+      return Sug(
+        id: maps[i]['id'],
+        sugar_value: maps[i]['sugar_value'],
+        date: DateTime.parse(maps[i]['date'].split("'")[3]), // TODO:
+      );
+    });
   }
 }
   class Sug{

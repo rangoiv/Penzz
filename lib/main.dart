@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:penzz/pages/save_sugar_value_screen.dart';
 
 import 'package:penzz/pages/welcome_screen.dart';
 import 'package:penzz/pages/after_login_screen.dart';
@@ -10,6 +11,8 @@ import 'package:penzz/pages/registration_screen.dart';
 import 'package:penzz/pages/scan_document_screen.dart';
 import 'package:penzz/pages/save_document_screen.dart';
 import 'package:penzz/pages/display_documents_screen.dart';
+import 'package:penzz/pages/sugar_values_screen.dart';
+import 'package:penzz/pages/save_sugar_value_screen.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -43,6 +46,8 @@ class Penzz extends StatelessWidget {
           ScanDocumentScreen.id: (context) => ScanDocumentScreen(),
           SaveDocumentScreen.id: (context) => SaveDocumentScreen(),
           DisplayDocumentsScreen.id: (context) => DisplayDocumentsScreen(),
+          SugarValuesScreen.id: (context) => SugarValuesScreen(),
+          SaveSugarValueScreen.id:(context) => SaveSugarValueScreen(),
         }
     );
   }

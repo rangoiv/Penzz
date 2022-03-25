@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:penzz/pages/sugar_values_screen.dart';
 import 'scan_document_screen.dart';
 import 'display_documents_screen.dart';
+import 'sugar_values_screen.dart';
 
 
 class AfterLoginScreen extends StatefulWidget {
@@ -67,7 +69,27 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
               height: 48.0,
             ),
 
-
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.0),
+              child: Material(
+                color: Colors.lightBlueAccent,
+                borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                elevation: 5.0,
+                child: MaterialButton(
+                  onPressed: ()  {
+                    Navigator.pushNamed(context,SugarValuesScreen.id);
+                  },
+                  minWidth: 200.0,
+                  height: 42.0,
+                  child: const Text(
+                    'Podatci o šećeru',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Material(
