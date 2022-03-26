@@ -92,6 +92,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             BlackButton(
               onPressed: ()  {
                 Navigator.pushNamed(context, DisplayDocumentsScreen.id);
+
               },
               text: "Dokumenti",
             ),

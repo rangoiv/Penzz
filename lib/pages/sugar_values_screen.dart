@@ -4,6 +4,8 @@ import 'package:penzz/pages/save_sugar_value_screen.dart';
 import 'package:penzz/helpers/storage.dart';
 import 'dart:io';
 
+import 'package:penzz/widgets/black_round_button.dart';
+
 
 
 class SugarValuesScreen extends StatefulWidget {
@@ -71,10 +73,10 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
             ]
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: BlackRoundButton(
         onPressed: _saveValue,
-        tooltip: 'Save sugar value',
-        child: const Icon(Icons.add),
+        //tooltip: 'Save sugar value',
+        icon: const Icon(Icons.add),
       ),
     );
   }

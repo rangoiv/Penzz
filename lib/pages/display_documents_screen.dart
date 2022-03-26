@@ -7,6 +7,7 @@ import 'package:penzz/pages/scan_document_screen.dart';
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:penzz/widgets/black_round_button.dart';
 import 'package:share_plus/share_plus.dart';
 
 class DisplayDocumentsScreen extends StatefulWidget {
@@ -15,7 +16,7 @@ class DisplayDocumentsScreen extends StatefulWidget {
   @override
   _DisplayDocumentsScreenState createState() => _DisplayDocumentsScreenState();
 }
-// TODO: riješiti glitch sa neucitavanjem
+// TODO: riješiti glitch s neucitavanjem
 class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
   @override
   void initState() {
@@ -59,11 +60,7 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
             ]
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _scanDocument,
-        tooltip: 'Scan document',
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: BlackRoundButton(onPressed: _scanDocument,),
     );
   }
 
