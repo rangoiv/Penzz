@@ -108,7 +108,7 @@ class DocumentWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(sug.sugar_value.toString() + ' : uneseno ' + sug.date.toString().split(' ')[0]),
+            Text(sug.sugar_value.toString() + ' mmol/l : uneseno ' + sug.date.toString().split(' ')[0]),
           ],
         ),
       ),

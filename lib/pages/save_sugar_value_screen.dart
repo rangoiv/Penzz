@@ -58,7 +58,7 @@ class _SaveSugarValueScreenState extends State<SaveSugarValueScreen>{
                       Sug sugar=Sug(id: await Sugar.getNewId(), sugar_value: input_value, date: DateTime.now());
                       if(sugar != null){
                         Sugar.insert(sugar);
-                        Navigator.pushNamed(context, SugarValuesScreen.id);
+                        Navigator.pop(context);
                       }
                     }
                     catch(e){
