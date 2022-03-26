@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import 'package:penzz/helpers/filter_image.dart';
 import 'package:penzz/pages/save_document_screen.dart';
+import 'package:penzz/widgets/black_round_button.dart';
 
 // A screen that allows users to take a picture using a given camera.
 class ScanDocumentScreen extends StatefulWidget {
@@ -89,18 +90,18 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
           children: <Widget>[
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: FloatingActionButton(
-                heroTag: "doneFloatingButton",
+              child: BlackRoundButton(
+                ht: "doneFloatingButton",
                 onPressed: done,
-                child: const Icon(Icons.check),
+                icon: const Icon(Icons.check),
               ),
             ),
             Container(
               margin: const EdgeInsets.all(10),
-              child: FloatingActionButton(
-                heroTag: "takePictureFloatingButton",
+              child: BlackRoundButton(
+                ht: "takePictureFloatingButton",
                 onPressed: takePicture,
-                child: const Icon(Icons.camera_alt),
+                icon: const Icon(Icons.camera_alt),
               ),
             ),
           ],

@@ -9,6 +9,7 @@ import 'package:penzz/pages/scan_document_screen.dart';
 import 'package:penzz/helpers/storage.dart';
 import 'package:penzz/helpers/documents_database.dart';
 import 'package:penzz/helpers/constants.dart';
+import 'package:penzz/widgets/black_round_button.dart';
 
 class SaveDocumentScreen extends StatefulWidget {
   static const String id = 'save_document_screen';
@@ -93,18 +94,18 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
         children: <Widget>[
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: FloatingActionButton(
-              heroTag: "doneFloatingButton",
+            child: BlackRoundButton(
+              ht: "doneFloatingButton",
               onPressed: _done,
-              child: const Icon(Icons.check),
+              icon: const Icon(Icons.check),
             ),
           ),
           Container(
             margin: const EdgeInsets.all(10),
-            child: FloatingActionButton(
-              heroTag: "addImageFloatingButton",
+            child: BlackRoundButton(
+              ht: "addImageFloatingButton",
               onPressed: _addImage,
-              child: const Icon(Icons.add),
+              icon: const Icon(Icons.add),
             ),
           ),
         ],
