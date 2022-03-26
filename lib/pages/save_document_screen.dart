@@ -6,9 +6,9 @@ import 'package:pdf/widgets.dart' as pw;
 
 import 'package:flutter/material.dart';
 import 'package:penzz/pages/scan_document_screen.dart';
-import 'package:penzz/storage.dart';
-import 'package:penzz/documents_database.dart';
-import 'package:penzz/constants.dart';
+import 'package:penzz/helpers/storage.dart';
+import 'package:penzz/helpers/documents_database.dart';
+import 'package:penzz/helpers/constants.dart';
 
 class SaveDocumentScreen extends StatefulWidget {
   static const String id = 'save_document_screen';

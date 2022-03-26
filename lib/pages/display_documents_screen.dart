@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:penzz/documents_database.dart';
-import 'package:penzz/storage.dart';
+import 'package:penzz/helpers/documents_database.dart';
+import 'package:penzz/helpers/storage.dart';
 import 'package:penzz/pages/scan_document_screen.dart';
 
 import 'package:pdf/pdf.dart';
@@ -15,27 +15,11 @@ class DisplayDocumentsScreen extends StatefulWidget {
   @override
   _DisplayDocumentsScreenState createState() => _DisplayDocumentsScreenState();
 }
-
+// TODO: riješiti glitch sa neucitavanjem
 class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
   @override
   void initState() {
     super.initState();
-
-    _begin();
-  }
-
-  @override
-  void dispose() {
-    Documents.close();
-    super.dispose();
-  }
-
-  void _begin() async {
-    //await Documents.deleteDatabase();
-    await Storage.loadUser();
-    await Documents.loadDatabase();
-
-    setState(() {});
   }
 
   @override
@@ -45,6 +29,7 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
       appBar: AppBar(title: const Text('Tvoji dokumenti')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        // TODO: rijesiti glitch sa scrollanjem
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -112,6 +97,7 @@ class DocumentWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(document.name),
+            // TODO: dodati preview na prvu stranicu
             ElevatedButton(
               onPressed: () => _onShare(context),
               child: const Text('Share'),
@@ -139,6 +125,7 @@ class DocumentWidget extends StatelessWidget {
   }
 
   void _onShare(BuildContext context) async {
+    // TODO: urediti ovo
     final box = context.findRenderObject() as RenderBox?;
 
     await Share.shareFiles(

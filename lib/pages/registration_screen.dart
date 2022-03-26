@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:penzz/constants.dart';
+import 'package:penzz/helpers/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:penzz/pages/after_login_screen.dart';
+import 'package:penzz/pages/welcome_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 
@@ -64,7 +64,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           .createUserWithEmailAndPassword(
                           email: email, password: password);
                       if (newUser != null) {
-                        Navigator.pushNamed(context, AfterLoginScreen.id);
+                        Navigator.pushNamed(context, WelcomeScreen.id);
                       }
                     }
                     catch (e) {

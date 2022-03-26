@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:path/path.dart';
-import 'package:penzz/storage.dart';
+import 'package:penzz/helpers/storage.dart';
 import 'package:sqflite/sqflite.dart';
 
 class Sugar {

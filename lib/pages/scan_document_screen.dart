@@ -7,7 +7,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-import 'package:penzz/filter_image.dart';
+import 'package:penzz/helpers/filter_image.dart';
 import 'package:penzz/pages/save_document_screen.dart';
 
 // A screen that allows users to take a picture using a given camera.

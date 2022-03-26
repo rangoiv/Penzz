@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:penzz/blood_sugar_database.dart';
+import 'package:penzz/helpers/blood_sugar_database.dart';
 import 'package:penzz/pages/save_sugar_value_screen.dart';
-import 'package:penzz/storage.dart';
+import 'package:penzz/helpers/storage.dart';
 import 'dart:io';
 
 

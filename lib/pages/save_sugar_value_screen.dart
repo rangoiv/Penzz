@@ -1,7 +1,7 @@
-import'package:penzz/blood_sugar_database.dart';
+import'package:penzz/helpers/blood_sugar_database.dart';
 import 'package:flutter/material.dart';
 import 'package:penzz/pages/sugar_values_screen.dart';
-import 'package:penzz/constants.dart';
+import 'package:penzz/helpers/constants.dart';
 
 class SaveSugarValueScreen extends StatefulWidget {
   static const String id = 'save sugar value screen';

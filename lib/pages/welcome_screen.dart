@@ -1,166 +1,109 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
-import 'package:penzz/constants.dart';
-import 'package:penzz/pages/after_login_screen.dart';
-import 'package:penzz/pages/registration_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 
+import 'package:penzz/helpers/documents_database.dart';
+import 'package:penzz/helpers/storage.dart';
+
+import 'package:penzz/pages/settings_screen.dart';
+import 'package:penzz/pages/sugar_values_screen.dart';
+import 'package:penzz/pages/scan_document_screen.dart';
+import 'package:penzz/pages/display_documents_screen.dart';
+import 'package:penzz/pages/sugar_values_screen.dart';
+
+import 'package:penzz/widgets/black_button.dart';
+import 'package:penzz/helpers/authorisation.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  static const String id = 'welcome screen';
+  static const String id = 'welcome_screen';
+
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  final _auth = FirebaseAuth.instance;
-  String email='';
-  String password='';
+  String helloMessage = 'Pozdrav!';
+
+  @override
+  void initState() {
+    super.initState();
+
+    // TODO: dodati loading screen dok se ovo ucitava
+    _loadAll();
+  }
+
+  @override
+  void dispose() {
+    // Dispose of all databases
+    Documents.close();
+
+    // Logout the user
+    Authorisation.logout();
+
+    super.dispose();
+  }
+
+  void _loadAll() async {
+    // TODO: napraviti ovo u zasebnu funkciju
+    // Load storage system
+    await Authorisation.getCurrentUser();
+    await Storage.loadUser();
+    // Load all databases
+    await Documents.loadDatabase();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('images/background.png'),fit: BoxFit.fill,
-        ),),
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.transparent,
-        body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              SizedBox(height: 88,),
-              Row(
-                children: <Widget>[
-                  Text(
-                    'Dobrodošli natrag!',
-                    style: TextStyle(
-                      fontSize: 30.0,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 50.0,
-              ),
-              Material(
-                color: Color(0XFFECF0F3),
-                borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                elevation: 3,
-                child: TextField(
-                    keyboardType: TextInputType.emailAddress,
-                  onChanged: (value) {
-                    email = value;
-                  },
-                  decoration: kTextFieldDecoration.copyWith(hintText: 'E-mail'),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              SizedBox(
-                height: 24.0,
-              ),
-              Material(
-                color: Color(0XFFECF0F3),
-                borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                elevation: 3,
-                child: TextField(
-
-                  obscureText: true,
-                  onChanged: (value) {
-                    password = value;
-                  },
-                  decoration: kTextFieldDecoration.copyWith(hintText: 'Lozinka'),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              SizedBox(
-                height: 24.0,
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 1, left: 100, right: 98),
-                child: IconButton(constraints: BoxConstraints.expand(height: 180, width: 180),
-
-                  icon: Image.asset('images/loginBtn.png'),
-                  onPressed:  () async {
-    try {
-    final user = await _auth.signInWithEmailAndPassword(
-    email: email, password: password);
-    if (user != null) {
-    Navigator.pushNamed(context, AfterLoginScreen.id);
-    }
-    }
-    catch (e) {
-    showAlertDialog(context);
-    }},
-                  iconSize: 66,
-                  splashColor:  Colors.cyan,
-                  visualDensity: VisualDensity.comfortable,
-                )
-              ),
-              SizedBox(height: 10,),
-              Material(
-
-                color: Color(0XFFECF0F3),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, RegistrationScreen.id);
-
-                  },
-                  child: Center(
-                    child: Text(
-                      'Stvorite račun',
-                      style: TextStyle(
-                        color: Color(0XFF6E7686),
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'NotoSans-Bold',
-                        fontSize: 17
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        //automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.pushNamed(context, SettingsScreen.id);
+            },
           ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+
+            const SizedBox(height: 110.0,),
+
+            Row(
+              children:  <Widget>[
+                Text(
+                  helloMessage,
+                  style: TextStyle(
+                    fontSize: 48.0,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 190.0,),
+
+            BlackButton(
+              onPressed: ()  {
+                Navigator.pushNamed(context, DisplayDocumentsScreen.id);
+              },
+              text: "Dokumenti",
+            ),
+            BlackButton(
+              onPressed: ()  {
+                Navigator.pushNamed(context, SugarValuesScreen.id);
+              },
+              text: "Podatci o šeceru",
+            ),
+          ]
         ),
       ),
     );
   }
 }
-showAlertDialog(BuildContext context) {
-
-  // set up the button
-  Widget okButton = TextButton(
-    child: Text("OK", style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold)),
-    onPressed: () {
-      Navigator.pop(context);
-    },
-  );
-
-  // set up the AlertDialog
-  AlertDialog alert = AlertDialog(
-    title: Text("Upozorenje"),
-    content: Text("Prvo napravi račun ako nisi ili se ulogiraj sa svojim e-mailom!", style: TextStyle(fontFamily: 'NotoSans'),),
-    actions: [
-      okButton,
-    ],
-  );
-
-  // show the dialog
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return alert;
-    },
-  );
-}
-
-
-
