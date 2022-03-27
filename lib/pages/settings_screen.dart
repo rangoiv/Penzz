@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:penzz/helpers/authorisation.dart';
 import 'package:penzz/helpers/documents_database.dart';
+import 'package:penzz/helpers/blood_sugar_database.dart';
 
 import '../widgets/black_button.dart';
 
@@ -36,6 +37,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onPressed: deleteDocumentsDatabase,
                   text: "Izbrisi bazu dokumenata",
                 ),
+                BlackButton(
+                  onPressed: () {print("Nothing happened");},
+                  text: "Izbrisi razinu secera",
+                ),
+                BlackButton(
+                  onPressed: deleteBloodSugarDatabase,
+                  text: "Izbrisi bazu za krvni secer",
+                ),
                 SizedBox(height: 50,),
                 BlackButton(
                   onPressed: logout,
@@ -53,6 +62,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // TODO: izbrisati i dokumente
     await Documents.deleteDatabase();
     await Documents.loadDatabase();
+  }
+
+  void deleteBloodSugarDatabase() async {
+    // TODO: izbrisati i dokumente
+    await Sugar.deleteDatabase();
+    await Sugar.loadDatabase();
   }
 
   void logout() async {

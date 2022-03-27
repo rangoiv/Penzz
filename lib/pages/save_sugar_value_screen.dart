@@ -2,6 +2,7 @@ import'package:penzz/helpers/blood_sugar_database.dart';
 import 'package:flutter/material.dart';
 import 'package:penzz/pages/sugar_values_screen.dart';
 import 'package:penzz/helpers/constants.dart';
+import 'package:penzz/pages/welcome_screen.dart';
 
 class SaveSugarValueScreen extends StatefulWidget {
   static const String id = 'save sugar value screen';
@@ -22,7 +23,7 @@ class _SaveSugarValueScreenState extends State<SaveSugarValueScreen>{
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Unesi svoj šećer')),
-      body: Padding(
+      body:Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

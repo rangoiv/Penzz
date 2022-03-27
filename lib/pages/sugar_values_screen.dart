@@ -40,7 +40,7 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Tvoj šećer')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -102,16 +102,21 @@ class DocumentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text("Razina šećera " + (index+1).toString() + ":", textAlign: TextAlign.center, textScaleFactor: 1.3,),
+      title: Text("Razina šećera " + (index + 1).toString() + ":",
+        textAlign: TextAlign.center, textScaleFactor: 1.3,),
       subtitle: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(sug.sugar_value.toString() + ' mmol/l : uneseno ' + sug.date.toString().split(' ')[0]),
+            Text(sug.sugar_value.toString() + ' mmol/l : uneseno ' +
+                sug.date.toString().split(' ')[0]),
           ],
         ),
       ),
     );
   }
 }
+
+
+
