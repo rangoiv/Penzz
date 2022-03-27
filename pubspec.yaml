@@ -53,8 +53,8 @@ dev_dependencies:
     sdk: flutter
 
 flutter_native_splash:
-  color: "#ECF0F3"
-  image: images/logo.png
+  color: "#FFFFFF"
+  image: images/penzz.png
   fullscreen: true
 
   flutter_lints: ^1.0.0
