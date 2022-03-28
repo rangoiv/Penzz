@@ -10,11 +10,11 @@ git pull (updejtati master)
 git checkout -b nova (napraviti novu granu gdje ce se delati i automatski se prebaciti na nju)
 
 Sada radite svoje promjene
-Kada je sve gotovo:
+Kad je sve gotovo:
 git branch (provjeriti jeste li na dobroj grani)
 git status (pogledati kaj se izmijenilo)
 git add ... (dodati sve promjene koje želite)
-git commit -m "Napisati ovdje kaj ste dodali" (napravi novi commit na trenutnoj grani sa dodanim promjenama)
+git commit -m "Napisati ovdje kaj ste dodali" (napravi novi commit na trenutnoj grani s dodanim promjenama)
 
 git rebase master grana
 

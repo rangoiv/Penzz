@@ -15,8 +15,8 @@ class GreenCircle extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.teal.withOpacity(0.8),
-            Colors.greenAccent.withOpacity(0.9),
+            Colors.teal.withOpacity(0.98),
+            Colors.greenAccent.withOpacity(0.98),
           ],
           begin: Alignment.bottomLeft,
           end: Alignment.centerRight,

@@ -11,6 +11,7 @@ import 'package:penzz/pages/sugar_values_screen.dart';
 
 import 'package:penzz/widgets/black_button.dart';
 import 'package:penzz/helpers/authorisation.dart';
+import 'package:penzz/widgets/green_circle.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static const String id = 'welcome_screen';
@@ -53,58 +54,73 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        //automaticallyImplyLeading: false,
+        backgroundColor: Colors.black,
         actions: [
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
-              Navigator.pushNamed(context, SettingsScreen.id);
+              Navigator.pushNamed(context,SettingsScreen.id);
             },
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-
-            const SizedBox(height: 110.0,),
-
-            Row(
-              children:  <Widget>[
-                Text(
-                  helloMessage,
-                  style: TextStyle(
-                    fontSize: 48.0,
-                    fontWeight: FontWeight.w900,
+      body: Stack(
+        alignment: AlignmentDirectional.bottomCenter,
+        children: [
+          Positioned(
+            child: GreenCircle(radius: 300),
+            top: 150,
+            right: -130,
+          ),
+          Positioned(
+            child: GreenCircle(radius: 200),
+            top: 260,
+            right: 70,
+          ),
+          Positioned(
+            child: GreenCircle(radius: 130),
+            top: 380,
+            right: 30,
+          ),
+          Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20,),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  const SizedBox(height: 110.0),
+                  Row(
+                    children: <Widget> [
+                      Text(
+                        helloMessage,
+                        style: TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
+                  const SizedBox(height: 190.0),
+                  BlackButton(
+                    onPressed: ()  {
+                      Navigator.pushNamed(context, DisplayDocumentsScreen.id);
 
-            const SizedBox(height: 190.0,),
-
-            BlackButton(
-              onPressed: ()  {
-                Navigator.pushNamed(context, DisplayDocumentsScreen.id);
-
-              },
-              text: "Dokumenti",
+                    },
+                    text: "Dokumenti",
+                  ),
+                  BlackButton(
+                    onPressed: ()  {
+                      Navigator.pushNamed(context, SugarValuesScreen.id);
+                    },
+                    text: "Tvoji podatci",
+                  ),
+                ],
             ),
-            BlackButton(
-              onPressed: ()  {
-                Navigator.pushNamed(context, SugarValuesScreen.id);
-              },
-              text: "Podatci o šeceru",
-            ),
-          ]
-        ),
+          ),
+        ],
       ),
     );
   }
 }
+
