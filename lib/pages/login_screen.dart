@@ -8,6 +8,8 @@ import 'package:penzz/pages/registration_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import '../widgets/green_circle.dart';
+
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -22,114 +24,147 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('images/background.png'),fit: BoxFit.fill,
-        ),),
+    return Container(color: Colors.white,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.transparent,
-        body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              SizedBox(height: 88,),
-              Row(
-                children: <Widget>[
-                  Text(
-                    'Dobrodošli natrag!',
-                    style: TextStyle(
-                      fontSize: 30.0,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 50.0,
-              ),
-              Material(
-                color: Color(0XFFECF0F3),
-                borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                elevation: 3,
-                child: TextField(
-                    keyboardType: TextInputType.emailAddress,
-                  onChanged: (value) {
-                    email = value;
-                  },
-                  decoration: kTextFieldDecoration.copyWith(hintText: 'E-mail'),
-                  textAlign: TextAlign.center,
+        body: Stack(
+            alignment: AlignmentDirectional.bottomCenter,
+            children: [
+        Positioned(
+        child: GreenCircle(radius: 280),
+        top: 260,
+        right: -130,
+      ),
+      Positioned(
+        child: GreenCircle(radius: 200),
+        top: 360,
+        right: 70,
+      ),
+      Positioned(
+        child: GreenCircle(radius: 110),
+        top: 480,
+        right: 30,
+      ),
+           Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                SizedBox(height: 40,),
+                Text('Dobrodošli', style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, fontFamily: 'Poppins-SemiBold'),),
+                Row(children: [
+                  Text('natrag u',  style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, fontFamily: 'Poppins-SemiBold')),
+                  SizedBox(width: 15,),
+                  Image.asset('images/arrowCircle.png', width: 40, height: 40,)
+                ],),
+                SizedBox(
+                  height: 30.0,
                 ),
-              ),
-              SizedBox(
-                height: 24.0,
-              ),
-              Material(
-                color: Color(0XFFECF0F3),
-                borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                elevation: 3,
-                child: TextField(
-
-                  obscureText: true,
-                  onChanged: (value) {
-                    password = value;
-                  },
-                  decoration: kTextFieldDecoration.copyWith(hintText: 'Lozinka'),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              SizedBox(
-                height: 24.0,
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 1, left: 100, right: 98),
-                child: IconButton(constraints: BoxConstraints.expand(height: 180, width: 180),
-
-                  icon: Image.asset('images/loginBtn.png'),
-                  onPressed:  () async {
-                    try {
-                        final user = await _auth.signInWithEmailAndPassword(
-                        email: email, password: password);
-                      if (user != null) {
-                        Navigator.pushNamed(context, WelcomeScreen.id);
-                      }
-                    }
-                    catch (e) {
-                      showAlertDialog(context);
-                    }},
-                  iconSize: 66,
-                  splashColor:  Colors.cyan,
-                  visualDensity: VisualDensity.comfortable,
-                )
-              ),
-              SizedBox(height: 10,),
-              Material(
-
-                color: Color(0XFFECF0F3),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, RegistrationScreen.id);
-
-                  },
-                  child: Center(
-                    child: Text(
-                      'Stvorite račun',
-                      style: TextStyle(
-                        color: Color(0XFF6E7686),
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'NotoSans-Bold',
-                        fontSize: 17
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 30, left: 10, right: 10),
+                  child: Container(
+                    child: Center(child: Image.asset('images/penzzTextWhite.png', width: 220,),),
+                    height: 150,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.teal.withOpacity(0.98),
+                          Colors.greenAccent.withOpacity(0.98),
+                        ],
+                        begin: Alignment.bottomLeft,
+                        end: Alignment.centerRight,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                            offset: Offset(10, 10),
+                            blurRadius: 20,
+                            color: Colors.teal.withOpacity(0.2)),
+                      ],
                     ),
                   ),
                 ),
-              ),
-            ],
+                Material(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                  elevation: 1,
+
+                  child: TextField(
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                    keyboardType: TextInputType.emailAddress,
+                    onChanged: (value) {
+                      email = value;
+                    },
+                    decoration: kTextFieldDecoration.copyWith(hintText: 'E-mail', hintStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.w900,  fontFamily: 'Poppins-SemiBold')),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                SizedBox(
+                  height: 24.0,
+                ),
+                Material(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                  elevation: 1,
+                  child: TextField(
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+
+                    obscureText: true,
+                    onChanged: (value) {
+                      password = value;
+                    },
+                    decoration: kTextFieldDecoration.copyWith(hintText: 'Lozinka',hintStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.w900,  fontFamily: 'Poppins-SemiBold'),),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                SizedBox(
+                  height: 20.0,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 110),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                    Expanded(child: InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(context, RegistrationScreen.id);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(color:Colors.black, borderRadius: BorderRadius.only(topLeft: Radius.circular(32), bottomLeft: Radius.circular(32))),
+                        height: 45,
+                        child: Center(
+                          child: Text('SIGN IN',
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Poppins-SemiBold', fontSize: 15),),),),
+                    )),
+                      SizedBox(width: 0.5,),
+                      Expanded(
+                          child: InkWell(
+                            onTap:  () async {
+                              try {
+                                final user = await _auth.signInWithEmailAndPassword(
+                                    email: email, password: password);
+                                if (user != null) {
+                                  Navigator.pushNamed(context, WelcomeScreen.id);
+                                }
+                              }
+                              catch (e) {
+                                showAlertDialog(context);
+                              }},
+                            child: Container(
+                              decoration: BoxDecoration(color:Colors.black, borderRadius: BorderRadius.only(topRight: Radius.circular(32), bottomRight: Radius.circular(32))),
+                              child: Center(child: Text('LOGIN', style:TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Poppins-SemiBold', fontSize: 15) ,),),
+                              height: 45 ,
+                              ),
+                          ))
+                  ],),
+                ),
+                Padding(padding: EdgeInsets.only(top: 10),child: Image.asset('images/penzzTextBlack.png', height: 25,),)
+
+              ],
+            ),
           ),
-        ),
+        ],),
       ),
     );
   }

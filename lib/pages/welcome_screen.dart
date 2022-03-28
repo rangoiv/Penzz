@@ -54,11 +54,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
+      appBar: AppBar(iconTheme: IconThemeData(color: Colors.black, size: 35),
+        backgroundColor: Colors.transparent,
+        bottomOpacity: 0,
+        elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: Icon(Icons.settings, color: Colors.black,),
             onPressed: () {
               Navigator.pushNamed(context,SettingsScreen.id);
             },
@@ -69,39 +71,43 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         alignment: AlignmentDirectional.bottomCenter,
         children: [
           Positioned(
-            child: GreenCircle(radius: 300),
-            top: 150,
-            right: -130,
-          ),
-          Positioned(
-            child: GreenCircle(radius: 200),
-            top: 260,
-            right: 70,
+            child: GreenCircle(radius: 280),
+            top: 20,
+            left: -100,
           ),
           Positioned(
             child: GreenCircle(radius: 130),
-            top: 380,
-            right: 30,
+            top: 150,
+            right: 160,
           ),
+          Positioned(
+            child: GreenCircle(radius: 180),
+            top: 170,
+            left: -30,
+          ),
+
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 20,),
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  const SizedBox(height: 110.0),
+                  SizedBox(height: 40,),
                   Row(
-                    children: <Widget> [
-                      Text(
-                        helloMessage,
-                        style: TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
+                    children: [
+                      SizedBox(width: 180,),
+                      Text(helloMessage, style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, fontFamily: 'Poppins-SemiBold'), textAlign: TextAlign.right,),
                     ],
                   ),
-                  const SizedBox(height: 190.0),
+
+                  const SizedBox(height: 250.0),
+                  Row(
+                    children: [
+                      SizedBox(width: 140,),
+                      Text('Odaberi radnju!', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, fontFamily: 'Poppins-SemiBold'), textAlign: TextAlign.right,),
+                    ],
+                  ),
+                  Divider(color: Colors.black, thickness: 0.5, height: 5,),
                   BlackButton(
                     onPressed: ()  {
                       Navigator.pushNamed(context, DisplayDocumentsScreen.id);
@@ -115,6 +121,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     },
                     text: "Tvoji podatci",
                   ),
+                  Divider(color: Colors.black, thickness: 0.5, height: 5,),
+                  Padding(padding: EdgeInsets.only(top: 25),child: Image.asset('images/penzzTextBlack.png', height: 25,),)
+
                 ],
             ),
           ),

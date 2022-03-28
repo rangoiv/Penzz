@@ -69,7 +69,10 @@ flutter:
     - family: NotoSans
       fonts:
         - asset: fonts/NotoSans-Regular.ttf
-
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins-SemiBold.ttf
+        - asset: fonts/Poppins-penzz.otf
 
 
     - family: Fredoka
