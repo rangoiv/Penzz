@@ -17,7 +17,7 @@ class DisplayDocumentsScreen extends StatefulWidget {
   @override
   _DisplayDocumentsScreenState createState() => _DisplayDocumentsScreenState();
 }
-// TODO: riješiti glitch s neucitavanjem
+
 class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
   String _searchText = "";
 
@@ -34,9 +34,8 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
         title: const Text('Tvoji dokumenti'),
         backgroundColor: const Color(0xff11121B),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        // TODO: rijesiti glitch sa scrollanjem
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -51,11 +50,14 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
                   style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                   keyboardType: TextInputType.emailAddress,
                   onChanged: (value) {
-                    _searchText = value;
+                    setState(() {
+                      _searchText = value;
+                    });
                   },
                   decoration: kTextFieldDecoration.copyWith(
-                      hintText: 'Traži',
-                      hintStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.w900,  fontFamily: 'Poppins-SemiBold'),
+                    hintText: 'Traži',
+                    hintStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.w900,  fontFamily: 'Poppins-SemiBold'),
+                    suffixIcon: Icon(Icons.search, color: Colors.white,),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -71,12 +73,36 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
                   if (snapshot.hasData) {
                     documents = snapshot.data!;
                   }
+                  List<Document> filteredDocuments = [];
+                  var searchText = _searchText.toLowerCase();
+
+                  // If search bar is empty display all documents, otherwise search for the wanted item
+                  if (searchText == "") {
+                    filteredDocuments = documents;
+                  } else {
+                    for (var i = 0; i < documents.length; i++) {
+                      final document = documents[i];
+                      bool contains = true;
+                      // Document is added if it contains all the words from search bar
+                      for (var word in searchText.split(new RegExp(r'[. ]'))) {
+                        if (!document.name.replaceAll("_", " ").replaceAll("-", " ").toLowerCase().contains(word) &&
+                            !document.type.replaceAll("_", " ").toLowerCase().contains(word)) {
+                          contains = false;
+                          break;
+                        }
+                      }
+                      if (contains) {
+                        filteredDocuments.add(document);
+                      }
+                    }
+                  }
+
                   return ListView.builder(
                     physics: const ScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: documents.length,
+                    itemCount: filteredDocuments.length,
                     itemBuilder: (context, index) {
-                      final document = documents[index];
+                      final document = filteredDocuments[index];
 
                       return DocumentWidget(document: document, index: index,);
                     },
@@ -91,7 +117,8 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
   }
 
   void _scanDocument() async {
-    Navigator.pushNamed(context, ScanDocumentScreen.id);
+    await Navigator.pushNamed(context, ScanDocumentScreen.id);
+    setState(() {});
   }
 }
 
@@ -129,22 +156,6 @@ class DocumentWidget extends StatelessWidget {
         ),
       ),
     );
-
-    /*
-    return FutureBuilder<File> (
-      future: getDocument(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          File file = snapshot.data!;
-
-
-        }
-        return ListTile(
-          title: Text("Dokument " + (index+1).toString() + ":", textAlign: TextAlign.center, textScaleFactor: 1.3,),
-        );
-      },
-    );
-    */
   }
 
   void _onShare(BuildContext context) async {
@@ -153,7 +164,7 @@ class DocumentWidget extends StatelessWidget {
 
     await Share.shareFiles(
         [(await Storage.getDocumentFile(document.id, document.name)).path],
-        text: "moj tekst",
+        //text: "moj tekst",
         subject: document.name,
         //sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     );

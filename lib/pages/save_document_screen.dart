@@ -10,20 +10,25 @@ import 'package:penzz/helpers/storage.dart';
 import 'package:penzz/helpers/documents_database.dart';
 import 'package:penzz/helpers/constants.dart';
 import 'package:penzz/widgets/black_round_button.dart';
+import 'package:intl/intl.dart';
 
 class SaveDocumentScreen extends StatefulWidget {
   static const String id = 'save_document_screen';
+  final List<String> editedImages;
 
-  const SaveDocumentScreen({Key? key}) : super(key: key);
+  const SaveDocumentScreen({Key? key, this.editedImages = const []}) : super(key: key);
 
   @override
   State<SaveDocumentScreen> createState() => _SaveDocumentScreenState();
 }
 
 class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
-  List<String> _editedImages = [];
+  List<String> editedImages;
   bool _firstBuild = true;
   String _documentType = kDocumentTypes[0];
+  DateTime _documentDate = DateTime.now();
+
+  _SaveDocumentScreenState({this.editedImages = const []});
 
   @override
   void initState() {
@@ -33,61 +38,95 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
   @override
   Widget build(BuildContext context) {
     // get routes of scanned images from context when building the first time
+
     if (_firstBuild) {
       var newEditedImages = ModalRoute.of(context)!.settings.arguments as List<String>;
-      _editedImages += newEditedImages;
+      editedImages += newEditedImages;
       _firstBuild = false;
     }
-    return Scaffold(
-      appBar: AppBar(title: const Text('Your new document')),
-      // The image is stored as a file on the device. Use the `Image.file`
-      // constructor with the given path to display the image.
-      body: ListView (
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(32, 16, 32, 10),
-            child: DropdownButton<String>(
-              value: _documentType,
-              icon: const Icon(Icons.arrow_downward),
-              elevation: 16,
-              style: const TextStyle(color: Colors.deepPurple),
-              underline: Container(
-                height: 2,
-                color: Colors.deepPurpleAccent,
-              ),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _documentType = newValue!;
-                });
-              },
-              items: kDocumentTypes
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value, style: const TextStyle(fontSize: 16)),
-                );
-              }).toList(),
-            ),
-          ),
-          ListView.builder(
-            physics: const ScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: _editedImages.length,
-            itemBuilder: (context, index) {
-              final imagePath = _editedImages[index];
 
-              return ListTile(
-                title: Text("Image " + (index+1).toString() + ":", textAlign: TextAlign.center, textScaleFactor: 1.3,),
-                subtitle: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 70),
-                  child: Image.file(
-                    File(imagePath),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Tvoj novi dokument'),
+        backgroundColor: const Color(0xff11121B),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(32.0, 16, 32, 0),
+        child: ListView (
+          children: <Widget>[
+            Text("Odaberite tip dokumenta:"),
+            // Document type selector
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3),
+
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                height: 36,
+                decoration: BoxDecoration(
+                    color: const Color(0xff11121B),
+                    borderRadius: BorderRadius.circular(5),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _documentType,
+                    icon: const Icon(Icons.arrow_drop_down_outlined, color: Colors.white,),
+                    elevation: 16,
+                    dropdownColor: const Color(0xff11121B),
+                    underline: null,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _documentType = newValue!;
+                      });
+                    },
+                    items: kDocumentTypes
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        alignment: AlignmentDirectional.center,
+                        value: value,
+                        child: Text(value, style: TextStyle(color: Colors.white),), //, style: const TextStyle(fontSize: 16, color: Colors.black)),
+                      );
+                    }).toList(),
                   ),
                 ),
-              );
-            },
-          ),
-        ],
+              ),
+            ),
+
+            SizedBox(height: 4),
+            Text("Odaberite Datum:"),
+            // Date selection button
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: const Color(0xff11121B),
+                ),
+                child: Text("Datum: " + DateFormat('MM/dd/yyyy').format(_documentDate)),
+                onPressed: () => _pickDate(context),
+              ),
+            ),
+            SizedBox(height: 16),
+
+            // Document list view
+            ListView.builder(
+              physics: const ScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: editedImages.length,
+              itemBuilder: (context, index) {
+                final imagePath = editedImages[index];
+
+                return ListTile(
+                  //title: Text("Image " + (index+1).toString() + ":", textAlign: TextAlign.center, textScaleFactor: 1.3,),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 70),
+                    child: Image.file(
+                      File(imagePath),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       floatingActionButton: Wrap(
         direction: Axis.vertical,
@@ -114,18 +153,39 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
   }
 
   void _addImage() async {
-    // open window for scanning images and get their routes
-    final newEditedImages = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const ScanDocumentScreen(launchedFromDisplayDocument: true),
-      ),
+    // Close this window to scan new Image
+    Navigator.pop(context, editedImages);
+  }
+
+  Future _pickDate(BuildContext context) async {
+    final newDate = await showDatePicker(
+      context: context,
+      initialDate: _documentDate,
+      firstDate: DateTime(DateTime.now().year - 5),
+      lastDate: DateTime(DateTime.now().year + 5),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: const Color(0xff11121B),
+            colorScheme: ColorScheme.light(
+              primary: const Color(0xff11121B),
+            ),
+            //buttonTheme: ButtonThemeData(
+            //    textTheme: ButtonTextTheme.primary
+            //),
+          ),
+          child: child!,
+        );
+      },
     );
-    setState(() { _editedImages += newEditedImages; });
+
+    if (newDate == null) return;
+
+    setState(() => _documentDate = newDate);
   }
 
   void _done() async {
-    if (_editedImages.isEmpty) {
+    if (editedImages.isEmpty) {
       await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -153,7 +213,7 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
     print("Creating pdf document.");
     final pdf = pw.Document();
 
-    for (var imagePath in _editedImages) {
+    for (var imagePath in editedImages) {
       final image = pw.MemoryImage(
         File(imagePath).readAsBytesSync(),
       );
@@ -168,7 +228,7 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
 
     Document document = Document(
       id: await Documents.getNewId(),
-      date: DateTime.now(),
+      date: _documentDate,
       type: _documentType,
     );
 

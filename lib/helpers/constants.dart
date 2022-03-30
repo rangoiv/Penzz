@@ -19,4 +19,4 @@ const kTextFieldDecoration = InputDecoration(
   ),
 );
 
-const kDocumentTypes = <String> ["Uputnica", "Covid potvrda", "Otpusno pismo"];
+const kDocumentTypes = <String> ["Uputnica", "Covid potvrda", "Otpusno pismo", "Krvni nalaz", "Ostalo"];

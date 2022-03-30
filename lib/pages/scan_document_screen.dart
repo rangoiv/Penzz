@@ -26,7 +26,7 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
   late CameraController _controller;
   late Future<void> _initializeCamera;
   final bool launchedFromDisplayDocument;
-  List<String> editedImages = [];
+  List<String> _editedImages = [];
 
   ScanDocumentScreenState({required this.launchedFromDisplayDocument});
 
@@ -34,6 +34,13 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
   void initState() {
     super.initState();
     _initializeCamera = _initializeCameraFunc();
+  }
+
+  @override
+  void dispose() {
+    // Dispose of the controller when the widget is disposed.
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _initializeCameraFunc() async {
@@ -52,52 +59,42 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
   }
 
   @override
-  void dispose() {
-    // Dispose of the controller when the widget is disposed.
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: goBack,
-      child: Scaffold(
-        appBar: AppBar(title: const Text('Take a picture')),
-        // You must wait until the controller is initialized before displaying the
-        // camera preview. Use a FutureBuilder to display a loading spinner until the
-        // controller has finished initializing.
-        body: FutureBuilder<void>(
-          future: _initializeCamera,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              // If the Future is complete, display the preview.
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  SizedBox(height: 15,),
-                  CameraPreview(_controller),
-                ]
-              );
-            } else {
-              // Otherwise, display a loading indicator.
-              return const Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
-        floatingActionButton: Wrap(
-          direction: Axis.vertical,
-          children: <Widget>[
-            Container(
-              margin: const EdgeInsets.all(10),
-              child: BlackRoundButton(
-                ht: "takePictureFloatingButton",
-                onPressed: takePicture,
-                icon: const Icon(Icons.camera_alt),
-              ),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Take a picture')),
+      // You must wait until the controller is initialized before displaying the
+      // camera preview. Use a FutureBuilder to display a loading spinner until the
+      // controller has finished initializing.
+      body: FutureBuilder<void>(
+        future: _initializeCamera,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            // If the Future is complete, display the preview.
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                SizedBox(height: 15,),
+                CameraPreview(_controller),
+              ]
+            );
+          } else {
+            // Otherwise, display a loading indicator.
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+      floatingActionButton: Wrap(
+        direction: Axis.vertical,
+        children: <Widget>[
+          Container(
+            margin: const EdgeInsets.all(10),
+            child: BlackRoundButton(
+              ht: "takePictureFloatingButton",
+              onPressed: takePicture,
+              icon: const Icon(Icons.camera_alt),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -118,7 +115,7 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
       // Enhance the image to make it look like pdf
       File editedImage = await(editImage(File(image.path)));
 
-      editedImages.add(editedImage.path);
+      _editedImages.add(editedImage.path);
     } catch (e) {
       // If an error occurs, log the error to the console.
       print(e);
@@ -127,25 +124,18 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
     await done();
   }
 
-  Future<bool> goBack() async {
-    if (launchedFromDisplayDocument) {
-      return true;
-    }
-    Navigator.pop(context, []);
-    return true;
-  }
-
   Future<void> done() async {
     // Display the images just taken
-    if (launchedFromDisplayDocument) {
-      Navigator.pop(context, editedImages);
-      return;
-    }
-    await Navigator.pushReplacementNamed(
+    final result = await Navigator.pushNamed(
         context,
         SaveDocumentScreen.id,
-        arguments: editedImages,
+        arguments: _editedImages,
     );
+    if (result == null) {
+      Navigator.pop(context);
+    } else {
+      _editedImages = List<String>.from(result as List);
+    }
   }
 }
 
