@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:penzz/helpers/constants.dart';
 import 'package:penzz/helpers/documents_database.dart';
 import 'package:penzz/helpers/storage.dart';
 import 'package:penzz/pages/scan_document_screen.dart';
@@ -18,6 +19,8 @@ class DisplayDocumentsScreen extends StatefulWidget {
 }
 // TODO: riješiti glitch s neucitavanjem
 class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
+  String _searchText = "";
+
   @override
   void initState() {
     super.initState();
@@ -27,7 +30,10 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Tvoji dokumenti')),
+      appBar: AppBar(
+        title: const Text('Tvoji dokumenti'),
+        backgroundColor: const Color(0xff11121B),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         // TODO: rijesiti glitch sa scrollanjem
@@ -35,6 +41,26 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
+              const SizedBox(height: 30,),
+              Material(
+                color: const Color(0xff11121B),
+                borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                elevation: 1,
+
+                child: TextField(
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (value) {
+                    _searchText = value;
+                  },
+                  decoration: kTextFieldDecoration.copyWith(
+                      hintText: 'Traži',
+                      hintStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.w900,  fontFamily: 'Poppins-SemiBold'),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
               const SizedBox(height: 30,),
 
               FutureBuilder<List<Document>>(

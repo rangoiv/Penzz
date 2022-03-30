@@ -89,14 +89,6 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
           direction: Axis.vertical,
           children: <Widget>[
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: BlackRoundButton(
-                ht: "doneFloatingButton",
-                onPressed: done,
-                icon: const Icon(Icons.check),
-              ),
-            ),
-            Container(
               margin: const EdgeInsets.all(10),
               child: BlackRoundButton(
                 ht: "takePictureFloatingButton",
@@ -131,6 +123,8 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
       // If an error occurs, log the error to the console.
       print(e);
     }
+
+    await done();
   }
 
   Future<bool> goBack() async {
