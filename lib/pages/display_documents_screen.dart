@@ -1,15 +1,17 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:pdf/pdf.dart';
 import 'package:penzz/helpers/constants.dart';
 import 'package:penzz/helpers/documents_database.dart';
 import 'package:penzz/helpers/storage.dart';
 import 'package:penzz/pages/scan_document_screen.dart';
 
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:penzz/widgets/black_round_button.dart';
 import 'package:share_plus/share_plus.dart';
+import 'dart:async';
+import 'package:open_file/open_file.dart';
 
 class DisplayDocumentsScreen extends StatefulWidget {
   static const String id = 'display_documents_screen';
@@ -123,7 +125,7 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
 }
 
 class DocumentWidget extends StatelessWidget {
-  const DocumentWidget({
+  DocumentWidget({
     Key? key,
     required this.document,
     required this.index
@@ -132,22 +134,31 @@ class DocumentWidget extends StatelessWidget {
   final Document document;
   final int index;
 
-  Future<File> getDocument() async {
-    File file = await Storage.getDocumentFile(document.id, document.name);
-    return file;
-  }
-
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text("Dokument " + (index+1).toString() + ":", textAlign: TextAlign.center, textScaleFactor: 1.3,),
+      title: Text(
+        document.name,
+        textAlign: TextAlign.center,
+        textScaleFactor: 1.2,
+      ),
       subtitle: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(document.name),
             // TODO: dodati preview na prvu stranicu
+            GestureDetector(
+              onTap: () async {
+                var file = await document.getFile();
+                OpenFile.open(file.path);
+              },
+              child: Container(
+                height: 150,
+                // Tried for document preview: advance_pdf_viewer: ^2.0.1
+                color: Colors.grey,
+              ),
+            ),
             ElevatedButton(
               onPressed: () => _onShare(context),
               child: const Text('Share'),

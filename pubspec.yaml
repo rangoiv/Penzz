@@ -47,6 +47,7 @@ dependencies:
   share_plus: ^4.0.2
 
   pdf: ^3.6.0
+  open_file: ^3.2.1
 
 dev_dependencies:
   flutter_test:

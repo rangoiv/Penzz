@@ -134,4 +134,9 @@ class Document {
   String toString() {
     return 'Document{id: $id, name: $name, type: $type, date: $date}';
   }
+
+  Future<File> getFile() async {
+    File file = await Storage.getDocumentFile(this.id, this.name);
+    return file;
+  }
 }
