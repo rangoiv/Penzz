@@ -139,4 +139,7 @@ class Document {
     File file = await Storage.getDocumentFile(this.id, this.name);
     return file;
   }
+  Future<File> getPageImage(int page) async {
+    return Storage.getDocumentImageFile(this.id, page);
+  }
 }

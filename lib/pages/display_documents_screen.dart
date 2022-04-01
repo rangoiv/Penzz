@@ -40,7 +40,7 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               const SizedBox(height: 30,),
               Material(
@@ -136,35 +136,51 @@ class DocumentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        document.name,
-        textAlign: TextAlign.center,
-        textScaleFactor: 1.2,
-      ),
-      subtitle: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // TODO: dodati preview na prvu stranicu
-            GestureDetector(
-              onTap: () async {
-                var file = await document.getFile();
-                OpenFile.open(file.path);
-              },
-              child: Container(
-                height: 150,
-                // Tried for document preview: advance_pdf_viewer: ^2.0.1
-                color: Colors.grey,
-              ),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+      width: 150,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ListTile(
+            title: Text(
+              document.name,
+              textAlign: TextAlign.center,
+              textScaleFactor: 1,
             ),
-            ElevatedButton(
+            trailing: IconButton(
               onPressed: () => _onShare(context),
-              child: const Text('Share'),
-            )
-          ],
-        ),
+              iconSize: 20,
+              icon: Icon(Icons.share, color: Colors.black,),
+            ),
+          ),
+          // TODO: dodati preview na prvu stranicu
+          GestureDetector(
+            onTap: () async {
+              var file = await document.getFile();
+              OpenFile.open(file.path);
+            },
+            child: FutureBuilder<File>(
+              future: () async {
+                return document.getPageImage(0);
+              }(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Image(
+                    image: FileImage(snapshot.data!),
+                    height: 150,
+                  );
+                } else if (snapshot.hasError) {
+                  print("Error opening preview for: " + document.name);
+                }
+                return Container(
+                  height: 150,
+                  color: Colors.grey,
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

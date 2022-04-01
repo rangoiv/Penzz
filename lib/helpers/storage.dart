@@ -44,6 +44,21 @@ class Storage {
 
     return file;
   }
+  static Future<File> getDocumentImageFile(int id, int page) async {
+    await _userCreated;
+
+    // No need to create document folder since it is expected to already be created
+    String documentImgDirPath = Path.join(await _getUserDocumentsDirectory(), id.toString(), 'images');
+    var documentDir = Directory(documentImgDirPath);
+    await _createFolder(documentDir);
+
+    // Create the document
+    var name = 'page_'+page.toString();
+    String filePath = Path.join(documentImgDirPath, name)+'.jpg';
+    File file = File(filePath);
+
+    return file;
+  }
   static Future<String> _getCurrentUserUid() async {
     try {
       final user = await _auth.currentUser;
@@ -87,6 +102,7 @@ class Storage {
 
   static Future<void> _createFolder(Directory usrFolder) async {
     if (await usrFolder.exists()) {
+      // TODO: zakomentirati ovu liniju
       print("Skipping - "+ usrFolder.path);
     } else{
       print("Creating - "+ usrFolder.path);

@@ -236,6 +236,11 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
     print("Saving document on path: \n" + file.path);
     await file.writeAsBytes(await pdf.save());
 
+    final imgPath = (await Storage.getDocumentImageFile(document.id, 0)).path;
+    print("From path: \n" + editedImages[0]);
+    print("Saving document cover on path: \n" + imgPath);
+    await File(editedImages[0]).copy(imgPath);
+
     await Documents.insertDocument(document);
   }
 }
