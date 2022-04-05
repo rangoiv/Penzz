@@ -6,8 +6,7 @@ import 'package:penzz/widgets/black_button.dart';
 import 'package:penzz/widgets/black_round_button.dart';
 
 import 'package:penzz/pages/welcome_screen.dart';
-import 'package:penzz/widgets/black_button.dart';
-import 'package:penzz/widgets/black_round_button.dart';
+
 
 class SaveSugarValueScreen extends StatefulWidget {
   static const String id = 'save sugar value screen';

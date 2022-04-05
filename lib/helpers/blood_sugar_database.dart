@@ -85,6 +85,17 @@ class Sugar {
       'Sugar', object.toMap(), conflictAlgorithm: ConflictAlgorithm.replace,);
   }
 
+  static Future<void> delete(int id) async{
+    print("Deleting - " + id.toString());
+    final db = await database;
+    try{
+      await db.delete('Sugar', where: 'id = ?', whereArgs: [id]);
+    }
+    catch(e){
+      debugPrint("Something went wrong!");
+    }
+  }
+
   static Future<List<Sug>> queryAll() async {
     final db = await database;
 

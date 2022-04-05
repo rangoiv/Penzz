@@ -82,7 +82,9 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
   }
 
   void _saveValue() async {
-    Navigator.pushNamed(context, SaveSugarValueScreen.id);
+    await Navigator.pushNamed(context, SaveSugarValueScreen.id);
+    setState(() {
+    });
   }
 }
 
@@ -116,7 +118,18 @@ class DocumentWidget extends StatelessWidget {
           ],
         ),
       ),
+      trailing: IconButton(
+        onPressed: () {
+          _deleteSugarValue(sug.id);
+        },
+        iconSize: 20,
+        icon: Icon(Icons.delete, color: Colors.grey,)
+      ),
     );
+  }
+  
+  void _deleteSugarValue(int id){
+     Sugar.delete(id);
   }
 }
 
