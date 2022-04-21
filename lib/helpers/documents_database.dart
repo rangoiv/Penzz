@@ -77,7 +77,7 @@ class Documents {
     return newIdInt;
   }
 
-  static Future<void> insertDocument(Document document) async {
+  static Future<void> insert(Document document) async {
     print("Inserting document in database - " + document.toString());
     final db = await database;
 
@@ -87,6 +87,18 @@ class Documents {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
+
+  static Future<void> delete(int id) async{
+    print("Deleting - " + id.toString());
+    final db = await database;
+    try{
+      await db.delete(_tableName, where: 'id = ?', whereArgs: [id]);
+    }
+    catch(e){
+      debugPrint("Something went wrong!");
+    }
+  }
+
   static Future<List<Document>> documents() async {
     final db = await database;
 

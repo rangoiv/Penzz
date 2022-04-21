@@ -61,7 +61,10 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Take a picture')),
+      appBar: AppBar(
+        backgroundColor: const Color(0xff11121B),
+        title: const Text('Take a picture')
+      ),
       // You must wait until the controller is initialized before displaying the
       // camera preview. Use a FutureBuilder to display a loading spinner until the
       // controller has finished initializing.

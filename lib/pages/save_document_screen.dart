@@ -241,6 +241,6 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
     print("Saving document cover on path: \n" + imgPath);
     await File(editedImages[0]).copy(imgPath);
 
-    await Documents.insertDocument(document);
+    await Documents.insert(document);
   }
 }
