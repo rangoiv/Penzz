@@ -3,8 +3,12 @@ import 'package:penzz/helpers/blood_sugar_database.dart';
 import 'package:penzz/pages/save_sugar_value_screen.dart';
 import 'package:penzz/helpers/storage.dart';
 import 'dart:io';
-
+import 'package:intl/intl.dart';
 import 'package:penzz/widgets/black_round_button.dart';
+
+import 'package:syncfusion_flutter_charts/charts.dart';
+
+
 
 
 
@@ -41,7 +45,7 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Tvoj šećer')),
+      appBar: AppBar(title: const Text('Tvoj šećer'), backgroundColor: const Color(0xff11121B),),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
@@ -49,7 +53,17 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               const SizedBox(height: 30,),
+              FutureBuilder<List<Sug>>(
+                future: Sugar.queryAll(),
 
+                builder: (context, snapshot) {
+                  List<Sug> value = [];
+                  if (snapshot.hasData) {
+                    value = snapshot.data!;
+                  }
+                  return BloodSugarChart(sugarData: value);
+                }
+              ),
               FutureBuilder<List<Sug>>(
                 future: Sugar.queryAll(),
 
@@ -58,14 +72,15 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
                   if (snapshot.hasData) {
                     sugar = snapshot.data!;
                   }
+                  //return BloodSugarChart(data:sugar);
                   return ListView.builder(
                     physics: const ScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: sugar.length,
                     itemBuilder: (context, index) {
                       final sug = sugar[index];
-
                       return DocumentWidget(sug: sug, index: index,);
+
                     },
                   );
                 },
@@ -114,7 +129,7 @@ class DocumentWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(sug.sugar_value.toString() + ' mmol/l : uneseno ' +
-                sug.date.toString().split(' ')[0]),
+            sug.date.toIso8601String()/*toString().split(' ')[0]*/ + ', ' +DateFormat('EEEE').format(sug.date)),
           ],
         ),
       ),
@@ -131,6 +146,55 @@ class DocumentWidget extends StatelessWidget {
   void _deleteSugarValue(int id){
      Sugar.delete(id);
   }
+}
+
+class BloodSugarChart extends StatelessWidget{
+  final chartKey = GlobalKey<SfCartesianChartState>();
+  List<Sug> sugarData = <Sug>[];
+  BloodSugarChart({required this.sugarData});
+
+  @override
+  Widget build(BuildContext context){
+
+
+    return Container(
+      height: 400,
+      padding: EdgeInsets.all(20),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+            child: Column(
+               children: <Widget>[
+                  Text('Tvoj šećer'),
+                  Expanded(
+                    child:
+                    SfCartesianChart(
+                      primaryXAxis: DateTimeAxis(
+                        intervalType: DateTimeIntervalType.hours,
+                        minimum: DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day-1),
+                        maximum: DateTime.now(),
+                      ),
+                      palette:<Color> [Colors.teal],
+                      series: <ChartSeries<Sug, DateTime>>[
+                      LineSeries(
+                          dataSource: sugarData,
+                          markerSettings: MarkerSettings( isVisible : true),
+                          xValueMapper: (Sug values, _)=> values.date,
+                          yValueMapper: (Sug values, _)=> values.sugar_value,
+                          name: 'BloodSugar'
+                      ),
+                    ],
+                    ),
+
+                  ),
+            ],
+        ),
+        ),
+      ),
+    );
+  }
+
+
 }
 
 

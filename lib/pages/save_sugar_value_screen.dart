@@ -26,7 +26,7 @@ class _SaveSugarValueScreenState extends State<SaveSugarValueScreen>{
   Widget build(BuildContext context)  {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Unesi svoj šećer')),
+      appBar: AppBar(title: const Text('Unesi svoj šećer'), backgroundColor: const Color(0xff11121B),),
       body:Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(

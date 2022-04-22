@@ -105,7 +105,7 @@ class Sugar {
       return Sug(
         id: maps[i]['id'],
         sugar_value: maps[i]['sugar_value'],
-        date: DateTime.parse(maps[i]['date'].split("'")[3]), // TODO:
+        date: DateTime.parse(maps[i]['date'].split("'")[3]),
       );
     });
   }
@@ -122,7 +122,7 @@ class Sugar {
   });
 
   Map<String, dynamic> toMap(){
-  String t = date.toString().split(' ')[0];
+  String t = date.toIso8601String();//toString().split(' ')[0];
   return{
   'id' : id,
   'sugar_value':sugar_value,
