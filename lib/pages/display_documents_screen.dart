@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:penzz/pages/save_document_screen.dart';
 
 import 'package:share_plus/share_plus.dart';
 import 'package:open_file/open_file.dart';
@@ -47,7 +48,7 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
           IconButton(
             icon: Icon(Icons.more_vert, color: Colors.white,),
             onPressed: () {
-              _onActions(context);
+              _onMoreActions(context);
             },
           ),
         ] : [
@@ -64,66 +65,73 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
       ),
       body: Background(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                const SizedBox(height: 30,),
+          padding: const EdgeInsets.all(20.0),
+          child: FutureBuilder<List<Document>>(
+            future: Documents.documents(),
 
-                FutureBuilder<List<Document>>(
-                  future: Documents.documents(),
+            builder: (context, snapshot) {
+              List<Document> documents = [];
+              if (snapshot.hasData) {
+                documents = snapshot.data!;
+              }
 
-                  builder: (context, snapshot) {
-                    List<Document> documents = [];
-                    if (snapshot.hasData) {
-                      documents = snapshot.data!;
-                    }
-                    List<Document> filteredDocuments = [];
-                    var searchText = _searchText.toLowerCase();
-
-                    // If search bar is empty display all documents, otherwise search for the wanted item
-                    if (searchText == "") {
-                      filteredDocuments = documents;
-                    } else {
-                      for (var i = 0; i < documents.length; i++) {
-                        final document = documents[i];
-                        bool contains = true;
-                        // Document is added if it contains all the words from search bar
-                        for (var word in searchText.split(new RegExp(r'[. ]'))) {
-                          if (!document.name.replaceAll("_", " ").replaceAll("-", " ").toLowerCase().contains(word) &&
-                              !document.type.replaceAll("_", " ").toLowerCase().contains(word)) {
-                            contains = false;
-                            break;
-                          }
-                        }
-                        if (contains) {
-                          filteredDocuments.add(document);
-                        }
-                      }
-                    }
-
-                    return ListView.builder(
-                      physics: const ScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: filteredDocuments.length,
-                      itemBuilder: (context, index) {
-                        final document = filteredDocuments[index];
-
-                        return DocumentWidget(
-                          document: document,
-                          index: index,
-                          reload: () {setState(() {});},
-                        );
-                      },
-                    );
-                  },
-                ),
-              ]
+              return _gridWidget(_filterDocuments(documents));
+            },
           ),
         ),
       ),
       floatingActionButton: BlackRoundButton(onPressed: _scanDocument,),
+    );
+  }
+
+  List<Document> _filterDocuments(List<Document> documents) {
+    List<Document> filteredDocuments = [];
+    var searchText = _searchText.toLowerCase();
+
+    // If search bar is empty display all documents, otherwise search for the wanted item
+    if (searchText == "") {
+      filteredDocuments = documents;
+    } else {
+      for (var i = 0; i < documents.length; i++) {
+        final document = documents[i];
+        bool contains = true;
+        // Document is added if it contains all the words from search bar
+        for (var word in searchText.split(new RegExp(r'[. ]'))) {
+          if (!document.name.replaceAll("_", " ").replaceAll("-", " ").toLowerCase().contains(word) &&
+              !document.type.replaceAll("_", " ").toLowerCase().contains(word)) {
+            contains = false;
+            break;
+          }
+        }
+        if (contains) {
+          filteredDocuments.add(document);
+        }
+      }
+    }
+    return filteredDocuments;
+  }
+
+  Widget _gridWidget(List<Document> documents) {
+    return GridView.builder(
+      padding: EdgeInsets.zero,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 1,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10
+      ),
+      physics: const ScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: documents.length,
+      itemBuilder: (context, index) {
+        final document = documents[index];
+
+        return DocumentWidget(
+          document: document,
+          index: index,
+          reload: () {setState(() {});},
+        );
+      },
     );
   }
 
@@ -148,7 +156,7 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
     );
   }
 
-  void _onActions(BuildContext context) async {
+  void _onMoreActions(BuildContext context) async {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -161,8 +169,8 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
             ListTile(
               leading: new Icon(Icons.upload_file),
               title: new Text('Dodaj pdf dokument'),
-              onTap: () {
-                _importDocument();
+              onTap: () async {
+                await _importDocument();
                 Navigator.pop(context);
               },
             ),
@@ -170,11 +178,18 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
         );
       });
   }
-  void _importDocument() async {
-
+  Future<void> _importDocument() async {
+    await Navigator.pushNamed(
+      context,
+      SaveDocumentScreen.id,
+      arguments: SaveDocumentArguments(
+        isImporting: true,
+      ),
+    );
+    setState(() {});
   }
 
-  void _scanDocument() async {
+  Future<void> _scanDocument() async {
     // TODO: dodati za ne prikazivati ponovno
     await showDialog(
       context: context,
@@ -194,9 +209,8 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
   }
 }
 
-
-
-class DocumentWidget extends StatefulWidget {
+// Widget for one document card
+class DocumentWidget extends StatelessWidget {
   DocumentWidget({
     Key? key,
     required this.document,
@@ -209,110 +223,103 @@ class DocumentWidget extends StatefulWidget {
   final void Function()? reload;
 
   @override
-  State<DocumentWidget> createState() => _DocumentWidgetState();
-}
-
-class _DocumentWidgetState extends State<DocumentWidget> {
-  @override
   Widget build(BuildContext context) {
-    double WIDTH = 200;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: WIDTH,
-            height: 50,
-            decoration: BoxDecoration(
-              color: const Color(0xff11121B),
-              borderRadius: BorderRadius.all(
-                Radius.circular(3),
+      children: [
+        Container(
+          height: 50,
+          decoration: BoxDecoration(
+            color: const Color(0xff11121B),
+            borderRadius: BorderRadius.all(
+              Radius.circular(3),
+            ),
+          ),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 30, left: 8, top: 2, bottom: 2),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      document.name,
+                      textAlign: TextAlign.left,
+                      textScaleFactor: 1,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      document.date.toString().split(' ')[0],
+                      textAlign: TextAlign.left,
+                      textScaleFactor: 1,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ]
+                ),
               ),
-            ),
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 35, left: 8, top: 2, bottom: 2),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        widget.document.name,
-                        textAlign: TextAlign.left,
-                        textScaleFactor: 1,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white,
-                        ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  onPressed: () => _onDocumentMoreActions(context),
+                  iconSize: 20,
+                  icon: Icon(Icons.more_vert, color: Colors.white,),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        Expanded(
+          child: Stack(
+            fit: StackFit.expand,
+
+            children: <Widget>[
+              FutureBuilder<File>(
+                future: () async {
+                  return document.getPageImage(0);
+                }(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Container(
+                      child: Image(
+                        image: FileImage(snapshot.data!),
                       ),
-                      Text(
-                        widget.document.date.toString().split(' ')[0],
-                        textAlign: TextAlign.left,
-                        textScaleFactor: 1,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ]
+                    );
+                  }
+                  return Container(
+                    color: Colors.grey,
+                  );
+                },
+              ),
+
+              Positioned.fill(
+                child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () async {
+                    var file = await document.getFile();
+                      OpenFile.open(file.path);
+                    },
                   ),
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: IconButton(
-                    onPressed: () => _onAction(context),
-                    iconSize: 20,
-                    icon: Icon(Icons.more_vert, color: Colors.white,),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-          FutureBuilder<File>(
-            future: () async {
-              return widget.document.getPageImage(0);
-            }(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Stack(
-                  children: <Widget>[
-                    Image(
-                      image: FileImage(snapshot.data!),
-                      height: 150,
-                      width: WIDTH,
-                    ),
-                    Positioned.fill(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () async {
-                            var file = await widget.document.getFile();
-                            OpenFile.open(file.path);
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              } else if (snapshot.hasError) {
-                print("Error opening preview for: " + widget.document.name);
-              }
-              return Container(
-                height: 150,
-                color: Colors.grey,
-              );
-            },
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  void _onAction(BuildContext context) async {
+  void _onDocumentMoreActions(BuildContext context) async {
     showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -326,7 +333,7 @@ class _DocumentWidgetState extends State<DocumentWidget> {
                 leading: new Icon(Icons.delete),
                 title: new Text('Izbriši'),
                 onTap: () async {
-                  await _onDelete(context);
+                  await _onDocumentDelete(context);
                   Navigator.pop(context);
                 },
               ),
@@ -334,7 +341,7 @@ class _DocumentWidgetState extends State<DocumentWidget> {
                 leading: new Icon(Icons.share),
                 title: new Text('Podijeli'),
                 onTap: () async {
-                  await _onShare(context);
+                  await _onDocumentShare(context);
                   Navigator.pop(context);
                 },
               ),
@@ -343,16 +350,16 @@ class _DocumentWidgetState extends State<DocumentWidget> {
         });
   }
 
-  Future<void> _onDelete(BuildContext context) async {
-    await Documents.delete(widget.document.id);
-    if (widget.reload != null) {
-      widget.reload!();
+  Future<void> _onDocumentDelete(BuildContext context) async {
+    await Documents.delete(document.id);
+    if (reload != null) {
+      reload!();
     };
   }
-  Future<void> _onShare(BuildContext context) async {
+  Future<void> _onDocumentShare(BuildContext context) async {
     await Share.shareFiles(
-        [(await Storage.getDocumentFile(widget.document.id, widget.document.name)).path],
-        subject: widget.document.name,
+        [(await Storage.getDocumentFile(document.id, document.name)).path],
+        subject: document.name,
     );
   }
 }

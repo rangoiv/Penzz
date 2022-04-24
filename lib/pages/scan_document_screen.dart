@@ -86,18 +86,10 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
           }
         },
       ),
-      floatingActionButton: Wrap(
-        direction: Axis.vertical,
-        children: <Widget>[
-          Container(
-            margin: const EdgeInsets.all(10),
-            child: BlackRoundButton(
-              ht: "takePictureFloatingButton",
-              onPressed: takePicture,
-              icon: const Icon(Icons.camera_alt),
-            ),
-          ),
-        ],
+      floatingActionButton: BlackRoundButton(
+        ht: "takePictureFloatingButton",
+        onPressed: takePicture,
+        icon: const Icon(Icons.camera_alt),
       ),
     );
   }
@@ -132,7 +124,9 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
     final result = await Navigator.pushNamed(
         context,
         SaveDocumentScreen.id,
-        arguments: _editedImages,
+        arguments: SaveDocumentArguments(
+          editedImages: _editedImages,
+        ),
     );
     if (result == null) {
       Navigator.pop(context);

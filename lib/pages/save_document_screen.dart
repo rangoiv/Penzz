@@ -14,21 +14,20 @@ import 'package:intl/intl.dart';
 
 class SaveDocumentScreen extends StatefulWidget {
   static const String id = 'save_document_screen';
-  final List<String> editedImages;
 
-  const SaveDocumentScreen({Key? key, this.editedImages = const []}) : super(key: key);
+  const SaveDocumentScreen({Key? key}) : super(key: key);
 
   @override
   State<SaveDocumentScreen> createState() => _SaveDocumentScreenState();
 }
 
 class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
-  List<String> editedImages;
   bool _firstBuild = true;
+  List<String> _editedImages = [];
+  bool _isImporting = false;
+
   String _documentType = kDocumentTypes[0];
   DateTime _documentDate = DateTime.now();
-
-  _SaveDocumentScreenState({this.editedImages = const []});
 
   @override
   void initState() {
@@ -37,18 +36,32 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // get routes of scanned images from context when building the first time
 
+    // get routes of scanned images from context when building the first time
     if (_firstBuild) {
-      var newEditedImages = ModalRoute.of(context)!.settings.arguments as List<String>;
-      editedImages += newEditedImages;
+      final args = ModalRoute.of(context)!.settings.arguments as SaveDocumentArguments;
+
+      _editedImages += args.editedImages;
+      _isImporting = args.isImporting;
       _firstBuild = false;
     }
+    print("IS IMPORTING");
+    print(_isImporting);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tvoj novi dokument'),
         backgroundColor: const Color(0xff11121B),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.info_outline_rounded, color: Colors.white,),
+            onPressed: () {
+              setState(() {
+                _info();
+              });
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(32.0, 16, 32, 0),
@@ -110,9 +123,9 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
             ListView.builder(
               physics: const ScrollPhysics(),
               shrinkWrap: true,
-              itemCount: editedImages.length,
+              itemCount: _editedImages.length,
               itemBuilder: (context, index) {
-                final imagePath = editedImages[index];
+                final imagePath = _editedImages[index];
 
                 return ListTile(
                   //title: Text("Image " + (index+1).toString() + ":", textAlign: TextAlign.center, textScaleFactor: 1.3,),
@@ -139,7 +152,7 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
               icon: const Icon(Icons.check),
             ),
           ),
-          Container(
+          if (!this._isImporting) Container(
             margin: const EdgeInsets.all(10),
             child: BlackRoundButton(
               ht: "addImageFloatingButton",
@@ -154,7 +167,7 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
 
   void _addImage() async {
     // Close this window to scan new Image
-    Navigator.pop(context, editedImages);
+    Navigator.pop(context, _editedImages);
   }
 
   Future _pickDate(BuildContext context) async {
@@ -184,8 +197,12 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
     setState(() => _documentDate = newDate);
   }
 
+  void _info() async {
+
+  }
+
   void _done() async {
-    if (editedImages.isEmpty) {
+    if (_editedImages.isEmpty) {
       await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -213,7 +230,7 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
     print("Creating pdf document.");
     final pdf = pw.Document();
 
-    for (var imagePath in editedImages) {
+    for (var imagePath in _editedImages) {
       final image = pw.MemoryImage(
         File(imagePath).readAsBytesSync(),
       );
@@ -237,10 +254,17 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
     await file.writeAsBytes(await pdf.save());
 
     final imgPath = (await Storage.getDocumentImageFile(document.id, 0)).path;
-    print("From path: \n" + editedImages[0]);
+    print("From path: \n" + _editedImages[0]);
     print("Saving document cover on path: \n" + imgPath);
-    await File(editedImages[0]).copy(imgPath);
+    await File(_editedImages[0]).copy(imgPath);
 
     await Documents.insert(document);
   }
+}
+
+class SaveDocumentArguments {
+  final List<String> editedImages;
+  final bool isImporting;
+
+  SaveDocumentArguments({this.editedImages = const [], this.isImporting = false});
 }
