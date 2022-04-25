@@ -28,6 +28,7 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
 
   String _documentType = kDocumentTypes[0];
   DateTime _documentDate = DateTime.now();
+  String _documentName = "";
 
   @override
   void initState() {
@@ -40,13 +41,30 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
     // get routes of scanned images from context when building the first time
     if (_firstBuild) {
       final args = ModalRoute.of(context)!.settings.arguments as SaveDocumentArguments;
+      print("==== Save document screen ====");
 
       _editedImages += args.editedImages;
       _isImporting = args.isImporting;
       _firstBuild = false;
+
+      print("Setting arguments");
+      print(args.editedImages);
+      print(args.documentDate);
+      print(args.documentType);
+      print(args.documentName);
+      if (args.documentDate != null) {
+        print("Setting Date");
+        _documentDate = args.documentDate!;
+      }
+      if (args.documentName != null) {
+        print("Setting Name");
+        _documentName = args.documentName!;
+      }
+      if (args.documentType != null) {
+        print("Setting Date");
+        _documentType = args.documentType!;
+      }
     }
-    print("IS IMPORTING");
-    print(_isImporting);
 
     return Scaffold(
       appBar: AppBar(
@@ -67,11 +85,43 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
         padding: const EdgeInsets.fromLTRB(32.0, 16, 32, 0),
         child: ListView (
           children: <Widget>[
+            Text("Unesite naziv dokumenta:"),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                height: 36,
+                decoration: BoxDecoration(
+                  color: const Color(0xff11121B),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: TextField(
+                  autofocus: false,
+                  keyboardType: TextInputType.text,
+                  controller: new TextEditingController(text: _documentName),
+                  onChanged: (value) {
+                    _documentName = value;
+                  },
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                  decoration: kTextFieldDecoration.copyWith(
+                    contentPadding: const EdgeInsets.all(0.0),
+                    hintText: Document.getDefaultName(date: _documentDate, type: _documentType),
+                    hintStyle: TextStyle(
+                      color: Colors.grey
+                    ),
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+              ),
+            ),
+
             Text("Odaberite tip dokumenta:"),
             // Document type selector
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 3),
-
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 height: 36,
@@ -105,7 +155,7 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
             ),
 
             SizedBox(height: 4),
-            Text("Odaberite Datum:"),
+            Text("Odaberite datum dokumenta:"),
             // Date selection button
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 3),
@@ -119,8 +169,10 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
             ),
             SizedBox(height: 16),
 
-            // Document list view
-            ListView.builder(
+            _isImporting ?
+            Container(
+                // Import button
+            ) : ListView.builder( // Document list view
               physics: const ScrollPhysics(),
               shrinkWrap: true,
               itemCount: _editedImages.length,
@@ -128,11 +180,25 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
                 final imagePath = _editedImages[index];
 
                 return ListTile(
-                  //title: Text("Image " + (index+1).toString() + ":", textAlign: TextAlign.center, textScaleFactor: 1.3,),
                   subtitle: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 70),
-                    child: Image.file(
-                      File(imagePath),
+                    child: Stack(
+                      fit: StackFit.loose,
+                      children: [
+                        Image.file(
+                          File(imagePath),
+                        ),
+                        Positioned.fill(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () async {
+                                _onPageMoreActions(context, index);
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -156,7 +222,7 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
             margin: const EdgeInsets.all(10),
             child: BlackRoundButton(
               ht: "addImageFloatingButton",
-              onPressed: _addImage,
+              onPressed: _addPage,
               icon: const Icon(Icons.add),
             ),
           ),
@@ -165,14 +231,50 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
     );
   }
 
-  void _addImage() async {
+  void _onPageMoreActions(BuildContext context, int index) async {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                title: new Text('Što želite napraviti sa ovom stranicom?'),
+              ),
+              ListTile(
+                leading: new Icon(Icons.delete),
+                title: new Text('Izbriši'),
+                onTap: () async {
+                  setState(() {
+                    _removePage(index);
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void _removePage(int index) {
+    _editedImages.removeAt(index);
+  }
+
+  void _addPage() async {
     // Close this window to scan new Image
-    Navigator.pop(context, _editedImages);
+    Navigator.pop(context, new SaveDocumentArguments(
+      editedImages: _editedImages,
+      documentName: _documentName,
+      documentType: _documentType,
+      documentDate: _documentDate,
+    ));
   }
 
   Future _pickDate(BuildContext context) async {
     final newDate = await showDatePicker(
       context: context,
+      helpText: "Odaberite datum",
+      cancelText: "Natrag",
       initialDate: _documentDate,
       firstDate: DateTime(DateTime.now().year - 5),
       lastDate: DateTime(DateTime.now().year + 5),
@@ -183,16 +285,13 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
             colorScheme: ColorScheme.light(
               primary: const Color(0xff11121B),
             ),
-            //buttonTheme: ButtonThemeData(
-            //    textTheme: ButtonTextTheme.primary
-            //),
           ),
           child: child!,
         );
       },
     );
 
-    if (newDate == null) return;
+    if (newDate == null || newDate == _documentDate) return;
 
     setState(() => _documentDate = newDate);
   }
@@ -226,6 +325,7 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
     Navigator.pop(context);
   }
 
+
   Future<void> _saveDocument() async {
     print("Creating pdf document.");
     final pdf = pw.Document();
@@ -243,10 +343,15 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
           }));
     }
 
+    if (_documentName=="") {
+      _documentName = Document.getDefaultName(date: _documentDate, type: _documentType);
+    }
+
     Document document = Document(
       id: await Documents.getNewId(),
       date: _documentDate,
       type: _documentType,
+      name: _documentName,
     );
 
     final file = await Storage.getDocumentFile(document.id, document.name);
@@ -264,7 +369,18 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
 
 class SaveDocumentArguments {
   final List<String> editedImages;
+  final String? documentName;
+  final String? documentType;
+  final DateTime? documentDate;
+
   final bool isImporting;
 
-  SaveDocumentArguments({this.editedImages = const [], this.isImporting = false});
+  SaveDocumentArguments({
+    this.editedImages = const [],
+    this.documentName,
+    this.documentType,
+    this.documentDate,
+
+    this.isImporting = false
+  });
 }

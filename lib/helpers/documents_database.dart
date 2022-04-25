@@ -121,17 +121,16 @@ class Document {
   final DateTime date;
   final String type;
 
+  static getDefaultName({required DateTime date, required String type}) {
+    return type.replaceAll(" ", "_") + "-" + date.toString().split(' ')[0];
+  }
+
   Document({
     required this.id,
-    String? name,
+    required this.name,
     required this.date,
     required this.type,
-  }) {
-    if (name == null || name == "") {
-      name = this.type.replaceAll(" ", "_") + "-" + date.toString().split(' ')[0];
-    }
-    this.name = name;
-  }
+  });
 
   Map<String, dynamic> toMap() {
     String d = date.toString().split(' ')[0];

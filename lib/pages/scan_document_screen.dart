@@ -27,6 +27,7 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
   late Future<void> _initializeCamera;
   final bool launchedFromDisplayDocument;
   List<String> _editedImages = [];
+  SaveDocumentArguments saveDocumentArguments = new SaveDocumentArguments();
 
   ScanDocumentScreenState({required this.launchedFromDisplayDocument});
 
@@ -63,7 +64,7 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xff11121B),
-        title: const Text('Take a picture')
+        title: const Text('Slikaj dokument')
       ),
       // You must wait until the controller is initialized before displaying the
       // camera preview. Use a FutureBuilder to display a loading spinner until the
@@ -121,17 +122,23 @@ class ScanDocumentScreenState extends State<ScanDocumentScreen> {
 
   Future<void> done() async {
     // Display the images just taken
-    final result = await Navigator.pushNamed(
+    saveDocumentArguments = new SaveDocumentArguments(
+      editedImages: _editedImages,
+      documentType: saveDocumentArguments.documentType,
+      documentDate: saveDocumentArguments.documentDate,
+      documentName: saveDocumentArguments.documentName,
+    );
+
+    var oldSaveDocumentArguments = await Navigator.pushNamed(
         context,
         SaveDocumentScreen.id,
-        arguments: SaveDocumentArguments(
-          editedImages: _editedImages,
-        ),
+        arguments: saveDocumentArguments,
     );
-    if (result == null) {
+    if (oldSaveDocumentArguments == null) {
       Navigator.pop(context);
     } else {
-      _editedImages = List<String>.from(result as List);
+      saveDocumentArguments = oldSaveDocumentArguments as SaveDocumentArguments;
+      _editedImages = saveDocumentArguments.editedImages;
     }
   }
 }

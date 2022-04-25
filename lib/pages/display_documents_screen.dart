@@ -351,10 +351,30 @@ class DocumentWidget extends StatelessWidget {
   }
 
   Future<void> _onDocumentDelete(BuildContext context) async {
-    await Documents.delete(document.id);
-    if (reload != null) {
-      reload!();
-    };
+    bool doDelete = await showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        content: const Text('Jeste li sigurni da želite izbrisati dokument?'),
+
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Natrag'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Izbriši'),
+          ),
+        ],
+      ),
+    );
+    if (doDelete) {
+      await Documents.delete(document.id);
+
+      if (reload != null) {
+        reload!();
+      };
+    }
   }
   Future<void> _onDocumentShare(BuildContext context) async {
     await Share.shareFiles(
