@@ -16,6 +16,17 @@ git status (pogledati kaj se izmijenilo)
 git add ... (dodati sve promjene koje želite)
 git commit -m "Napisati ovdje kaj ste dodali" (napravi novi commit na trenutnoj grani s dodanim promjenama)
 
+Ako ste nešto radili, a došao je novi commit
+(recimo da je promjena na grani "grana"
+git checkout -b backup (prvo bi bilo dobro napraviti backup)
 git rebase master grana
 
+Sad bi trebalo biti spojeno, u slučaju da ima conlflicta:
+git status (provjeriti gdje su conflicti)
+Riješiti ručno sve conflicte
+git rebase --continue
+Sad bi trebalo biti gotovo
+
+
+Na kraju push
 git push origin grana:master

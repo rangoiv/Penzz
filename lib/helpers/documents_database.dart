@@ -151,6 +151,6 @@ class Document {
     return file;
   }
   Future<File> getPageImage(int page) async {
-    return Storage.getDocumentImageFile(this.id, page);
+    return Storage.getDocumentImageFile(this.id, page, create: false);
   }
 }

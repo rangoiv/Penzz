@@ -5,11 +5,11 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import 'package:flutter/material.dart';
-import 'package:penzz/pages/scan_document_screen.dart';
 import 'package:penzz/helpers/storage.dart';
 import 'package:penzz/helpers/documents_database.dart';
 import 'package:penzz/helpers/constants.dart';
 import 'package:penzz/widgets/black_round_button.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 
 class SaveDocumentScreen extends StatefulWidget {
@@ -23,12 +23,15 @@ class SaveDocumentScreen extends StatefulWidget {
 
 class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
   bool _firstBuild = true;
-  List<String> _editedImages = [];
-  bool _isImporting = false;
 
+  List<String> _editedImages = [];
   String _documentType = kDocumentTypes[0];
   DateTime _documentDate = DateTime.now();
   String _documentName = "";
+
+  bool _isImporting = false;
+  String? _importFilePath;
+
 
   @override
   void initState() {
@@ -41,27 +44,18 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
     // get routes of scanned images from context when building the first time
     if (_firstBuild) {
       final args = ModalRoute.of(context)!.settings.arguments as SaveDocumentArguments;
-      print("==== Save document screen ====");
 
       _editedImages += args.editedImages;
       _isImporting = args.isImporting;
       _firstBuild = false;
 
-      print("Setting arguments");
-      print(args.editedImages);
-      print(args.documentDate);
-      print(args.documentType);
-      print(args.documentName);
       if (args.documentDate != null) {
-        print("Setting Date");
         _documentDate = args.documentDate!;
       }
       if (args.documentName != null) {
-        print("Setting Name");
         _documentName = args.documentName!;
       }
       if (args.documentType != null) {
-        print("Setting Date");
         _documentType = args.documentType!;
       }
     }
@@ -170,40 +164,7 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
             SizedBox(height: 16),
 
             _isImporting ?
-            Container(
-                // Import button
-            ) : ListView.builder( // Document list view
-              physics: const ScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: _editedImages.length,
-              itemBuilder: (context, index) {
-                final imagePath = _editedImages[index];
-
-                return ListTile(
-                  subtitle: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 70),
-                    child: Stack(
-                      fit: StackFit.loose,
-                      children: [
-                        Image.file(
-                          File(imagePath),
-                        ),
-                        Positioned.fill(
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () async {
-                                _onPageMoreActions(context, index);
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+            _buildImportButton(context) : _buildListView(),
           ],
         ),
       ),
@@ -229,6 +190,76 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildImportButton(BuildContext context) {
+    return ListView(
+      physics: const ScrollPhysics(),
+      shrinkWrap: true,
+      children: [
+        SizedBox(height: 40,),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 3),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: const Color(0xff11121B),
+            ),
+            child: Text("Odaberi datoteku"),
+            onPressed: () => _pickFile(context),
+          ),
+        ),
+        if (_importFilePath != null) Container(
+          child: Image.asset(
+            "images/pdf_sample.png",
+            height: 150,
+          ),
+        ),
+        if (_importFilePath != null) Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text(
+            _importFilePath!,
+            style: TextStyle(
+              fontSize: 12,
+            ),
+          ),
+        ),
+      ]
+    );
+  }
+
+  Widget _buildListView() {
+    return ListView.builder( // Document list view
+            physics: const ScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: _editedImages.length,
+            itemBuilder: (context, index) {
+              final imagePath = _editedImages[index];
+
+              return ListTile(
+                subtitle: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 70),
+                  child: Stack(
+                    fit: StackFit.loose,
+                    children: [
+                      Image.file(
+                        File(imagePath),
+                      ),
+                      Positioned.fill(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () async {
+                              _onPageMoreActions(context, index);
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
   }
 
   void _onPageMoreActions(BuildContext context, int index) async {
@@ -296,13 +327,46 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
     setState(() => _documentDate = newDate);
   }
 
+  _pickFile(BuildContext context) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+    print("Picking files result");
+    if (result == null) {
+      print("No file was picked");
+    } else {
+      setState(() {
+        _importFilePath = result.files[0].path!;
+      });
+    }
+  }
+
   void _info() async {
 
   }
 
   void _done() async {
-    if (_editedImages.isEmpty) {
-      await showDialog(
+    if (_isImporting) {
+      if (_importFilePath == null) {
+        await _alertEmptyDocument();
+      } else {
+        await _saveDocument();
+        Navigator.pop(context);
+      }
+    } else {
+      if (_editedImages.isEmpty) {
+        await _alertEmptyDocument();
+      } else {
+        await _saveDocument();
+        Navigator.pop(context);
+      }
+    }
+  }
+
+  Future<void> _alertEmptyDocument() async {
+    await showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -313,36 +377,16 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
                 child: Text("OK", style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold)),
                 onPressed: () {
                   Navigator.pop(context);
+                  Navigator.pop(context);
                 },
               ),
             ],
           );
         },
-      );
-    } else {
-      await _saveDocument();
-    }
-    Navigator.pop(context);
+    );
   }
 
-
   Future<void> _saveDocument() async {
-    print("Creating pdf document.");
-    final pdf = pw.Document();
-
-    for (var imagePath in _editedImages) {
-      final image = pw.MemoryImage(
-        File(imagePath).readAsBytesSync(),
-      );
-      pdf.addPage(pw.Page(
-          pageFormat: PdfPageFormat.a4,
-          build: (pw.Context context) {
-            return pw.Center(
-              child: pw.Image(image),
-            );
-          }));
-    }
-
     if (_documentName=="") {
       _documentName = Document.getDefaultName(date: _documentDate, type: _documentType);
     }
@@ -353,15 +397,41 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
       type: _documentType,
       name: _documentName,
     );
+    var newDocumentFile = await Storage.getDocumentFile(document.id, document.name);
+    
+    if (_isImporting) {
+      // Save document
+      File(_importFilePath!).copy(newDocumentFile.path);
+      
+    } else {
+      print("Creating pdf document.");
+      final pdf = pw.Document();
 
-    final file = await Storage.getDocumentFile(document.id, document.name);
-    print("Saving document on path: \n" + file.path);
-    await file.writeAsBytes(await pdf.save());
+      for (var imagePath in _editedImages) {
+        final image = pw.MemoryImage(
+          File(imagePath).readAsBytesSync(),
+        );
+        pdf.addPage(pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          margin: pw.EdgeInsets.all(20), // in millimeters probably
+          build: (pw.Context context) {
+            return pw.Center(
+              child: pw.Image(image),
+            );
+          }));
+      }
 
-    final imgPath = (await Storage.getDocumentImageFile(document.id, 0)).path;
-    print("From path: \n" + _editedImages[0]);
-    print("Saving document cover on path: \n" + imgPath);
-    await File(_editedImages[0]).copy(imgPath);
+      // Saving the document
+      print("Saving document on path: \n" + newDocumentFile.path);
+      await newDocumentFile.writeAsBytes(await pdf.save());
+      
+      // Saving the cover of the file
+      final coverPath = _editedImages[0];
+      final coverSavePath = (await Storage.getDocumentImageFile(document.id, 0)).path;
+      print("From path: \n" + _editedImages[0]);
+      print("Saving document cover on path: \n" + coverSavePath);
+      await File(coverPath).copy(coverSavePath);
+    }
 
     await Documents.insert(document);
   }

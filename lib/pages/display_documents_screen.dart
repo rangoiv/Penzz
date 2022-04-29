@@ -23,10 +23,19 @@ class DisplayDocumentsScreen extends StatefulWidget {
 class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
   String _searchText = "";
   bool _isSearching = false;
+  List<Document> _documents = [];
+  List<Document> _filteredDocuments = [];
 
   @override
   void initState() {
     super.initState();
+    _loadDocuments();
+  }
+
+  Future<void> _loadDocuments() async {
+    print("Getting documents from database");
+    _documents = await Documents.documents();
+    setState(() {});
   }
 
   @override
@@ -34,7 +43,7 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: !_isSearching ? const Text('Tvoji dokumenti') : _searchTextField(),
+        title: !_isSearching ? const Text('Tvoji dokumenti') : _buildSearchTextField(),
         backgroundColor: const Color(0xff11121B),
         actions: !_isSearching ? [
           IconButton(
@@ -66,18 +75,7 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
       body: Background(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
-          child: FutureBuilder<List<Document>>(
-            future: Documents.documents(),
-
-            builder: (context, snapshot) {
-              List<Document> documents = [];
-              if (snapshot.hasData) {
-                documents = snapshot.data!;
-              }
-
-              return _gridWidget(_filterDocuments(documents));
-            },
-          ),
+          child: _buildGridView(context),
         ),
       ),
       floatingActionButton: BlackRoundButton(onPressed: _scanDocument,),
@@ -111,7 +109,10 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
     return filteredDocuments;
   }
 
-  Widget _gridWidget(List<Document> documents) {
+  Widget _buildGridView(BuildContext context) {
+    print("Building grid view");
+    _filteredDocuments = _filterDocuments(_documents);
+
     return GridView.builder(
       padding: EdgeInsets.zero,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -122,20 +123,20 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
       ),
       physics: const ScrollPhysics(),
       shrinkWrap: true,
-      itemCount: documents.length,
+      itemCount: _filteredDocuments.length,
       itemBuilder: (context, index) {
-        final document = documents[index];
+        final document = _filteredDocuments[index];
 
         return DocumentWidget(
           document: document,
           index: index,
-          reload: () {setState(() {});},
+          reload: _loadDocuments,
         );
       },
     );
   }
 
-  Widget _searchTextField() {
+  Widget _buildSearchTextField() {
     return TextField(
       style: TextStyle(color: Colors.white,),
       autofocus: true,
@@ -186,26 +187,30 @@ class _DisplayDocumentsScreenState extends State<DisplayDocumentsScreen> {
         isImporting: true,
       ),
     );
-    setState(() {});
+    await _loadDocuments();
   }
 
   Future<void> _scanDocument() async {
     // TODO: dodati za ne prikazivati ponovno
-    await showDialog(
+    var result = await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
         content: const Text('Molimo dokument uslikajte odozgora tako da se rubovi slažu uz rub ekrana.'),
 
         actions: <Widget>[
           TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
+            onPressed: () {
+              Navigator.pop(context, 'OK');
+            },
             child: const Text('OK'),
           ),
         ],
       ),
     );
-    await Navigator.pushNamed(context, ScanDocumentScreen.id);
-    setState(() {});
+    if (result != null) {
+      await Navigator.pushNamed(context, ScanDocumentScreen.id);
+      _loadDocuments();
+    }
   }
 }
 
@@ -285,18 +290,22 @@ class DocumentWidget extends StatelessWidget {
             children: <Widget>[
               FutureBuilder<File>(
                 future: () async {
-                  return document.getPageImage(0);
+                  return await document.getPageImage(0);
                 }(),
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
+                  if (snapshot.hasData && snapshot.data != null) {
                     return Container(
                       child: Image(
                         image: FileImage(snapshot.data!),
                       ),
                     );
+                  } else {
+                    print("Can't load first page on: " + document.name);
                   }
                   return Container(
-                    color: Colors.grey,
+                    child: Image.asset(
+                      "images/pdf_sample.png"
+                    ),
                   );
                 },
               ),

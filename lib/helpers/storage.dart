@@ -30,7 +30,7 @@ class Storage {
     return _getUserDirectory();
   }
 
-  static Future<File> getDocumentFile(int id, String name) async {
+  static Future<File> getDocumentFile(int id, String name, {bool create = true}) async {
     await _userCreated;
 
     // Create document folder in documents directory
@@ -42,20 +42,31 @@ class Storage {
     String filePath = Path.join(documentDirPath, name)+'.pdf';
     File file = File(filePath);
 
+    // Check if file exists
+    if (!create && !await file.exists()) {
+      throw new Exception("File doesn't exist");
+    }
+
     return file;
   }
-  static Future<File> getDocumentImageFile(int id, int page) async {
+  static Future<File> getDocumentImageFile(int id, int page, {bool create = true}) async {
     await _userCreated;
 
     // No need to create document folder since it is expected to already be created
     String documentImgDirPath = Path.join(await _getUserDocumentsDirectory(), id.toString(), 'images');
     var documentDir = Directory(documentImgDirPath);
+
     await _createFolder(documentDir);
 
     // Create the document
     var name = 'page_'+page.toString();
     String filePath = Path.join(documentImgDirPath, name)+'.jpg';
     File file = File(filePath);
+
+    // Check if file already exists
+    if (!create && !await file.exists()) {
+      throw new Exception("File doesn't exist");
+    }
 
     return file;
   }
@@ -101,13 +112,9 @@ class Storage {
   }
 
   static Future<void> _createFolder(Directory usrFolder) async {
-    if (await usrFolder.exists()) {
-      // TODO: zakomentirati ovu liniju
-      print("Skipping - "+ usrFolder.path);
-    } else{
+    if (!await usrFolder.exists()) {
       print("Creating - "+ usrFolder.path);
       await usrFolder.create(recursive: true);
     }
   }
-
 }
