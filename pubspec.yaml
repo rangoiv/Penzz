@@ -51,6 +51,7 @@ dependencies:
 
   charts_flutter: ^0.12.0
   syncfusion_flutter_charts: ^20.1.48
+  translator: ^0.1.7
 
 dev_dependencies:
   flutter_test:

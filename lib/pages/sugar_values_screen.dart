@@ -12,6 +12,8 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 
 
 
+
+
 class SugarValuesScreen extends StatefulWidget {
   static const String id = 'sugar_values_screen';
 
@@ -52,7 +54,7 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const SizedBox(height: 30,),
+              const SizedBox(height: 10,),
               FutureBuilder<List<Sug>>(
                 future: Sugar.queryAll(),
 
@@ -64,6 +66,9 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
                   return BloodSugarChart(sugarData: value);
                 }
               ),
+              const SizedBox(height: 10,),
+              Text('Mjerenja:', textAlign: TextAlign.left, style: TextStyle(fontSize: 30),),
+              const SizedBox(height: 5,),
               FutureBuilder<List<Sug>>(
                 future: Sugar.queryAll(),
 
@@ -79,7 +84,7 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
                     itemCount: sugar.length,
                     itemBuilder: (context, index) {
                       final sug = sugar[index];
-                      return DocumentWidget(sug: sug, index: index,);
+                      return DocumentWidget(sug: sug, index: index,reload: () {setState(() {});},);
 
                     },
                   );
@@ -107,46 +112,57 @@ class DocumentWidget extends StatelessWidget {
   const DocumentWidget({
     Key? key,
     required this.sug,
-    required this.index
+    required this.index,
+    required this.reload
   }) : super(key: key);
 
   final Sug sug;
   final int index;
+  final void Function()? reload;
+
+
 
   Future<File> getDocument() async {
-    File file = await Storage.getDocumentFile(sug.id, sug.sugar_value.toString());
+    File file = await Storage.getDocumentFile(
+        sug.id, sug.sugar_value.toString());
     return file;
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text("Razina šećera " + (index + 1).toString() + ":",
-        textAlign: TextAlign.center, textScaleFactor: 1.3,),
+    return Card(child: ListTile(
+      title: Text(
+          DateFormat('dd/MM/yyyy, HH:mm').format(sug.date) + ":",
+        textAlign: TextAlign.left, textScaleFactor: 1.15,),
       subtitle: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(sug.sugar_value.toString() + ' mmol/l : uneseno ' +
-            sug.date.toIso8601String()/*toString().split(' ')[0]*/ + ', ' +DateFormat('EEEE').format(sug.date)),
+            Text(sug.sugar_value.toString() + 'mmol/l', textScaleFactor: 1.2,
+              textAlign: TextAlign.left,),
           ],
         ),
       ),
       trailing: IconButton(
-        onPressed: () {
-          _deleteSugarValue(sug.id);
-        },
-        iconSize: 20,
-        icon: Icon(Icons.delete, color: Colors.grey,)
+          onPressed: () {
+            _deleteSugarValue(sug.id);
+          },
+          iconSize: 20,
+          icon: Icon(Icons.more_vert, color: Colors.grey,)
       ),
+    ),
     );
   }
-  
-  void _deleteSugarValue(int id){
-     Sugar.delete(id);
-  }
 }
+
+void _deleteSugarValue(int id){
+  Sugar.delete(id);
+}
+
+
+  
+
 
 class BloodSugarChart extends StatelessWidget{
   final chartKey = GlobalKey<SfCartesianChartState>();
