@@ -1,16 +1,34 @@
-# penzz
 
-Aplikacija za spremanje dokumenata iz bolnice.
+# Penzz
+App made for controlling your health. Primarily for users in Croatia, and possibly abroad.
+It was made as a part of [Lumen development](https://www.estudent.hr/projekti/lumen-development) competition.
 
-## Getting Started
+## About App
+This project is meant to help all the people who want to have control over their health.
+It achieves this goal with two core functionalities.
+* It allows you to scan and save your health documents
+* it allows you to log your health data (like mass, blood sugar or blood pressure).
 
-This project is a starting point for a Flutter application.
+## Screenshots
 
-A few resources to get you started if this is your first Flutter project:
+## Technologies
+Project is created with:
+* Flutter 2.10.2
+* Dart 2.16.1
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Setup
+To run this project, first install android studio.
+Then select File > New > Project from version control.
+Now select Github as version control, select the location and paste the URL of this project (on github press code > HTTPS).
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Project structure
+All project code is divided in three main categories: 
+* helpers (for backend code)
+* pages (for all pages in app)
+* widgets (for custom widgets)
+
+## Authors
+* [Antonija](https://github.com/AntonijaL)
+* [Iva](https://github.com/ivasaurus)
+* [Goran](https://github.com/rangoiv)
+* [Sven](https://github.com/Boltzmann314)

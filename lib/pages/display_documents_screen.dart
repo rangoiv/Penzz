@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:penzz/pages/save_document_screen.dart';
 
@@ -235,7 +236,7 @@ class DocumentWidget extends StatelessWidget {
 
       children: [
         Container(
-          height: 50,
+          height: 54,
           decoration: BoxDecoration(
             color: const Color(0xff11121B),
             borderRadius: BorderRadius.all(

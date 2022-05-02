@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 class BlackButton extends StatelessWidget {
   const BlackButton({
-    Key? key, this.text = "", this.onPressed,
+    Key? key, this.text = "", this.onPressed, this.icon,
   }) : super(key: key);
 
   final String text;
   final void Function()? onPressed;
+  final Icon? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +25,22 @@ class BlackButton extends StatelessWidget {
           },
           minWidth: 200.0,
           height: 42.0,
-          child: Text(
-            this.text,
-            style: TextStyle(
-              color: Colors.white,
-            ),
+          child: Stack (
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Text(
+                  this.text,
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              if (this.icon != null) Align(
+                alignment: Alignment.centerLeft,
+                child: this.icon!,
+              )
+            ],
           ),
         ),
       ),
