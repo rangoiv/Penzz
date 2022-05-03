@@ -53,6 +53,7 @@ dependencies:
   syncfusion_flutter_charts: ^20.1.48
   translator: ^0.1.7
   file_picker: ^4.5.1
+  local_auth: ^2.0.0
 
 dev_dependencies:
   flutter_test:
