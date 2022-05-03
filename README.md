@@ -11,7 +11,11 @@ It achieves this goal with two core functionalities.
 
 ## Screenshots
 <div align="center">
-    <img src="/images/screenshots/add_document_import_1.jpg" width="400px"</img> 
+    <img src="/images/screenshots/login_page.jpg" width="300px"</img> 
+    <img src="/images/screenshots/welcome_screen.jpg" width="300px"</img> 
+    <img src="/images/screenshots/add_document_import_1.jpg" width="300px"</img> 
+    <img src="/images/screenshots/your_documents_1.jpg" width="300px"</img> 
+    <img src="/images/screenshots/your_sugar.jpg" width="300px"</img> 
 </div>
 
 ## Technologies
