@@ -2,15 +2,17 @@ import 'dart:io';
 import 'dart:async';
 
 import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
 
 import 'package:flutter/material.dart';
 import 'package:penzz/helpers/storage.dart';
 import 'package:penzz/helpers/documents_database.dart';
 import 'package:penzz/helpers/constants.dart';
+import 'package:penzz/widgets/background.dart';
 import 'package:penzz/widgets/black_round_button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
+
+import 'package:penzz/helpers/pdf_helper.dart';
 
 class SaveDocumentScreen extends StatefulWidget {
   static const String id = 'save_document_screen';
@@ -75,97 +77,99 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(32.0, 16, 32, 0),
-        child: ListView (
-          children: <Widget>[
-            Text("Unesite naziv dokumenta:"),
+      body: Background(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(32.0, 16, 32, 0),
+          child: ListView (
+            children: <Widget>[
+              Text("Unesite naziv dokumenta:"),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                height: 36,
-                decoration: BoxDecoration(
-                  color: const Color(0xff11121B),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: TextField(
-                  autofocus: false,
-                  keyboardType: TextInputType.text,
-                  controller: new TextEditingController(text: _documentName),
-                  onChanged: (value) {
-                    _documentName = value;
-                  },
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                  decoration: kTextFieldDecoration.copyWith(
-                    contentPadding: const EdgeInsets.all(0.0),
-                    hintText: Document.getDefaultName(date: _documentDate, type: _documentType),
-                    hintStyle: TextStyle(
-                      color: Colors.grey
-                    ),
-                  ),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-            ),
-
-            Text("Odaberite tip dokumenta:"),
-            // Document type selector
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                height: 36,
-                decoration: BoxDecoration(
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  height: 36,
+                  decoration: BoxDecoration(
                     color: const Color(0xff11121B),
                     borderRadius: BorderRadius.circular(5),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: _documentType,
-                    icon: const Icon(Icons.arrow_drop_down_outlined, color: Colors.white,),
-                    elevation: 16,
-                    dropdownColor: const Color(0xff11121B),
-                    underline: null,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _documentType = newValue!;
-                      });
+                  ),
+                  child: TextField(
+                    autofocus: false,
+                    keyboardType: TextInputType.text,
+                    controller: new TextEditingController(text: _documentName),
+                    onChanged: (value) {
+                      _documentName = value;
                     },
-                    items: kDocumentTypes
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        alignment: AlignmentDirectional.center,
-                        value: value,
-                        child: Text(value, style: TextStyle(color: Colors.white),), //, style: const TextStyle(fontSize: 16, color: Colors.black)),
-                      );
-                    }).toList(),
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                    decoration: kTextFieldDecoration.copyWith(
+                      contentPadding: const EdgeInsets.all(0.0),
+                      hintText: Document.getDefaultName(date: _documentDate, type: _documentType),
+                      hintStyle: TextStyle(
+                        color: Colors.grey
+                      ),
+                    ),
+                    textAlign: TextAlign.left,
                   ),
                 ),
               ),
-            ),
 
-            SizedBox(height: 4),
-            Text("Odaberite datum dokumenta:"),
-            // Date selection button
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: const Color(0xff11121B),
+              Text("Odaberite tip dokumenta:"),
+              // Document type selector
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  height: 36,
+                  decoration: BoxDecoration(
+                      color: const Color(0xff11121B),
+                      borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _documentType,
+                      icon: const Icon(Icons.arrow_drop_down_outlined, color: Colors.white,),
+                      elevation: 16,
+                      dropdownColor: const Color(0xff11121B),
+                      underline: null,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _documentType = newValue!;
+                        });
+                      },
+                      items: kDocumentTypes
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          alignment: AlignmentDirectional.center,
+                          value: value,
+                          child: Text(value, style: TextStyle(color: Colors.white),), //, style: const TextStyle(fontSize: 16, color: Colors.black)),
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 ),
-                child: Text("Datum: " + DateFormat('MM/dd/yyyy').format(_documentDate)),
-                onPressed: () => _pickDate(context),
               ),
-            ),
-            SizedBox(height: 16),
 
-            _isImporting ?
-            _buildImportButton(context) : _buildListView(),
-          ],
+              SizedBox(height: 4),
+              Text("Odaberite datum dokumenta:"),
+              // Date selection button
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: const Color(0xff11121B),
+                  ),
+                  child: Text("Datum: " + DateFormat('MM/dd/yyyy').format(_documentDate)),
+                  onPressed: () => _pickDate(context),
+                ),
+              ),
+              SizedBox(height: 16),
+
+              _isImporting ?
+              _buildImportButton(context) : _buildListView(),
+            ],
+          ),
         ),
       ),
       floatingActionButton: Wrap(
@@ -344,7 +348,34 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
   }
 
   void _info() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Upute'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
 
+         children: [
+           Text('U odgovarajuća mjesta unesite podatke o dokumentu.'),
+           SizedBox(height: 10,),
+           Text('Ako ne unesete naslov, koristit će se autogenerirani naslov (sivim slovima).'),
+           SizedBox(height: 10,),
+           Text('Pritisnite kvačicu da biste spremili dokument.'),
+           if (!_isImporting) SizedBox(height: 10,),
+           if (!_isImporting) Text('Pritisnite znak plus da biste dodali još jednu stranicu na dokument.'),
+         ],
+        ),
+
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Ok'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _done() async {
@@ -404,27 +435,14 @@ class _SaveDocumentScreenState extends State<SaveDocumentScreen> {
       File(_importFilePath!).copy(newDocumentFile.path);
       
     } else {
+      // Creating the document
       print("Creating pdf document.");
-      final pdf = pw.Document();
-
-      for (var imagePath in _editedImages) {
-        final image = pw.MemoryImage(
-          File(imagePath).readAsBytesSync(),
-        );
-        pdf.addPage(pw.Page(
-          pageFormat: PdfPageFormat.a4,
-          margin: pw.EdgeInsets.all(20), // in millimeters probably
-          build: (pw.Context context) {
-            return pw.Center(
-              child: pw.Image(image),
-            );
-          }));
-      }
+      pdfWrapper pdf = createPdf(_editedImages);
 
       // Saving the document
       print("Saving document on path: \n" + newDocumentFile.path);
-      await newDocumentFile.writeAsBytes(await pdf.save());
-      
+      savePdf(newDocumentFile, pdf);
+
       // Saving the cover of the file
       final coverPath = _editedImages[0];
       final coverSavePath = (await Storage.getDocumentImageFile(document.id, 0)).path;

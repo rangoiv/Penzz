@@ -10,6 +10,7 @@ It achieves this goal with two core functionalities.
 * it allows you to log your health data (like mass, blood sugar or blood pressure).
 
 ## Screenshots
+![Alt text](/images/screenshots/add_document_import_1.jpg?raw=true "Importing document")
 
 ## Technologies
 Project is created with:

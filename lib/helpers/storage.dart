@@ -49,6 +49,13 @@ class Storage {
 
     return file;
   }
+  static Future<void> deleteDocumentDirectory(int id) async {
+    String documentDirPath = Path.join(await _getUserDocumentsDirectory(), id.toString());
+    print("Deleting - " + documentDirPath);
+    var documentDir = Directory(documentDirPath);
+    await documentDir.delete(recursive: true);
+  }
+
   static Future<File> getDocumentImageFile(int id, int page, {bool create = true}) async {
     await _userCreated;
 

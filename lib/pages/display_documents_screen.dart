@@ -380,6 +380,7 @@ class DocumentWidget extends StatelessWidget {
     );
     if (doDelete) {
       await Documents.delete(document.id);
+      await Storage.deleteDocumentDirectory(document.id);
 
       if (reload != null) {
         reload!();
