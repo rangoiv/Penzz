@@ -6,8 +6,12 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:penzz/pages/blood_pressure_screen.dart';
 
 import 'package:penzz/pages/login_screen.dart';
+import 'package:penzz/pages/mass_values_screen.dart';
+import 'package:penzz/pages/save_blood_pressure_screen.dart';
+import 'package:penzz/pages/save_mass_screen.dart';
 import 'package:penzz/pages/welcome_screen.dart';
 import 'package:penzz/pages/registration_screen.dart';
 import 'package:penzz/pages/scan_document_screen.dart';
@@ -50,6 +54,10 @@ class Penzz extends StatelessWidget {
           SugarValuesScreen.id: (context) => SugarValuesScreen(),
           SaveSugarValueScreen.id:(context) => SaveSugarValueScreen(),
           SettingsScreen.id:(context) => SettingsScreen(),
+          MassValuesScreen.id:(context) =>MassValuesScreen(),
+          SaveMassScreen.id:(context) => SaveMassScreen(),
+          BloodPressureScreen.id:(context) => BloodPressureScreen(),
+          SaveBloodPressureScreen.id:(context) => SaveBloodPressureScreen(),
         }
     );
   }

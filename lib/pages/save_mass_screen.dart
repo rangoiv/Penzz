@@ -1,4 +1,4 @@
-import'package:penzz/helpers/blood_sugar_database.dart';
+import'package:penzz/helpers/mass_database.dart';
 import 'package:flutter/material.dart';
 
 import 'package:penzz/helpers/constants.dart';
@@ -8,25 +8,25 @@ import 'package:penzz/widgets/black_button.dart';
 
 
 
-class SaveSugarValueScreen extends StatefulWidget {
-  static const String id = 'save sugar value screen';
+class SaveMassScreen extends StatefulWidget {
+  static const String id = 'save mass screen';
 
-  const SaveSugarValueScreen({Key? key}) : super(key: key);
+  const SaveMassScreen({Key? key}) : super(key: key);
 
   @override
-  _SaveSugarValueScreenState createState() => _SaveSugarValueScreenState();
+  _SaveMassScreenState createState() => _SaveMassScreenState();
 }
 
-class _SaveSugarValueScreenState extends State<SaveSugarValueScreen>{
+class _SaveMassScreenState extends State<SaveMassScreen>{
   String s='';
-  int input_value=-1;
+  double input_value=-1;
 
 
   @override
   Widget build(BuildContext context)  {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Unesi svoj šećer'), backgroundColor: const Color(0xff11121B),),
+      appBar: AppBar(title: const Text('Unesi svoju masu'), backgroundColor: const Color(0xff11121B),),
       body:Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
@@ -41,12 +41,11 @@ class _SaveSugarValueScreenState extends State<SaveSugarValueScreen>{
 
                 onChanged: (value) async {
                   s=value;
-                  input_value=int.parse(s);
+                  input_value=double.parse(s);
                 },
-                decoration: kTextFieldDecoration.copyWith(hintText: 'Unesi razinu šećera'),
-                autofocus: true,
-                keyboardType: TextInputType.number,
-
+                decoration: kTextFieldDecoration.copyWith(hintText: 'Unesi svoju masu'),
+              autofocus: true,
+              keyboardType: TextInputType.number,
             ),
 
             SizedBox(
@@ -55,9 +54,9 @@ class _SaveSugarValueScreenState extends State<SaveSugarValueScreen>{
             BlackButton(
               onPressed: () async {
                 try{
-                  Sug sugar=Sug(id: await Sugar.getNewId(), sugar_value: input_value, date: DateTime.now());
-                  if(sugar.sugar_value!=-1){
-                    Sugar.insert(sugar);
+                  mass masa=mass(id: await Mass.getNewId(), mass_value: input_value, date: DateTime.now());
+                  if(masa.mass_value!=-1){
+                    Mass.insert(masa);
                     Navigator.pop(context);
                   }
                 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:penzz/helpers/blood_sugar_database.dart';
-import 'package:penzz/pages/save_sugar_value_screen.dart';
+import 'package:penzz/helpers/mass_database.dart';
+import 'package:penzz/pages/save_mass_screen.dart';
 import 'package:penzz/helpers/storage.dart';
 import 'dart:io';
 import 'package:intl/intl.dart';
@@ -14,14 +14,14 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 
 
 
-class SugarValuesScreen extends StatefulWidget {
-  static const String id = 'sugar_values_screen';
+class MassValuesScreen extends StatefulWidget {
+  static const String id = 'mass_values_screen';
 
   @override
-  _SugarValuesScreenState createState() => _SugarValuesScreenState();
+  _MassValuesScreenState createState() => _MassValuesScreenState();
 }
 
-class _SugarValuesScreenState extends State<SugarValuesScreen> {
+class _MassValuesScreenState extends State<MassValuesScreen> {
   void initState() {
     super.initState();
 
@@ -30,14 +30,14 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
 
   @override
   void dispose() {
-    Sugar.close();
+    Mass.close();
     super.dispose();
   }
 
   void _begin() async {
     //await Documents.deleteDatabase();
     await Storage.loadUser();
-    await Sugar.loadDatabase();
+    await Mass.loadDatabase();
 
     setState(() {});
   }
@@ -47,7 +47,7 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Tvoj šećer'), backgroundColor: const Color(0xff11121B),),
+      appBar: AppBar(title: const Text('Tvoja masa'), backgroundColor: const Color(0xff11121B),),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
@@ -55,36 +55,36 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               const SizedBox(height: 10,),
-              FutureBuilder<List<Sug>>(
-                future: Sugar.queryAll(),
+              FutureBuilder<List<mass>>(
+                  future: Mass.queryAll(),
 
-                builder: (context, snapshot) {
-                  List<Sug> value = [];
-                  if (snapshot.hasData) {
-                    value = snapshot.data!;
+                  builder: (context, snapshot) {
+                    List<mass> value = [];
+                    if (snapshot.hasData) {
+                      value = snapshot.data!;
+                    }
+                    return MassChart(massData: value);
                   }
-                  return BloodSugarChart(sugarData: value);
-                }
               ),
               const SizedBox(height: 10,),
               Text('Mjerenja:', textAlign: TextAlign.left, style: TextStyle(fontSize: 30),),
               const SizedBox(height: 5,),
-              FutureBuilder<List<Sug>>(
-                future: Sugar.queryAll(),
+              FutureBuilder<List<mass>>(
+                future: Mass.queryAll(),
 
                 builder: (context, snapshot) {
-                  List<Sug> sugar = [];
+                  List<mass> masa = [];
                   if (snapshot.hasData) {
-                    sugar = snapshot.data!;
+                    masa = snapshot.data!;
                   }
                   //return BloodSugarChart(data:sugar);
                   return ListView.builder(
                     physics: const ScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: sugar.length,
+                    itemCount: masa.length,
                     itemBuilder: (context, index) {
-                      final sug = sugar[index];
-                      return DocumentWidget(sug: sug, index: index,reload: () {setState(() {});},);
+                      final val = masa[index];
+                      return DocumentWidget(val: val, index: index,reload: () {setState(() {});},);
 
                     },
                   );
@@ -102,7 +102,7 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
   }
 
   void _saveValue() async {
-    await Navigator.pushNamed(context, SaveSugarValueScreen.id);
+    await Navigator.pushNamed(context, SaveMassScreen.id);
     setState(() {
     });
   }
@@ -111,12 +111,12 @@ class _SugarValuesScreenState extends State<SugarValuesScreen> {
 class DocumentWidget extends StatelessWidget {
   const DocumentWidget({
     Key? key,
-    required this.sug,
+    required this.val,
     required this.index,
     required this.reload,
   }) : super(key: key);
 
-  final Sug sug;
+  final mass val;
   final int index;
   final void Function()? reload;
 
@@ -124,7 +124,7 @@ class DocumentWidget extends StatelessWidget {
 
   Future<File> getDocument() async {
     File file = await Storage.getDocumentFile(
-        sug.id, sug.sugar_value.toString());
+        val.id, val.mass_value.toString());
     return file;
   }
 
@@ -132,14 +132,14 @@ class DocumentWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(child: ListTile(
       title: Text(
-          DateFormat('dd/MM/yyyy, HH:mm').format(sug.date) + ":",
+        DateFormat('dd/MM/yyyy, HH:mm').format(val.date) + ":",
         textAlign: TextAlign.left, textScaleFactor: 1.15,),
       subtitle: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(sug.sugar_value.toString() + 'mmol/l', textScaleFactor: 1.2,
+            Text(val.mass_value.toString() + 'kg', textScaleFactor: 1.2,
               textAlign: TextAlign.left,),
           ],
         ),
@@ -169,7 +169,7 @@ class DocumentWidget extends StatelessWidget {
                 leading: new Icon(Icons.delete),
                 title: new Text('Izbriši'),
                 onTap: () async {
-                  await _onSugarDelete(context);
+                  await _onMassDelete(context);
                   Navigator.pop(context);
                 },
               ),
@@ -178,7 +178,7 @@ class DocumentWidget extends StatelessWidget {
         });
   }
 
-  Future<void> _onSugarDelete(BuildContext context) async {
+  Future<void> _onMassDelete(BuildContext context) async {
     bool doDelete = await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
@@ -197,7 +197,7 @@ class DocumentWidget extends StatelessWidget {
       ),
     );
     if (doDelete) {
-      await Sugar.delete(sug.id);
+      await Mass.delete(val.id);
 
       if (reload != null) {
         reload!();
@@ -207,10 +207,10 @@ class DocumentWidget extends StatelessWidget {
 
 
 }
-class BloodSugarChart extends StatelessWidget{
+class MassChart extends StatelessWidget{
   final chartKey = GlobalKey<SfCartesianChartState>();
-  List<Sug> sugarData = <Sug>[];
-  BloodSugarChart({required this.sugarData});
+  List<mass> massData = <mass>[];
+  MassChart({required this.massData});
 
   @override
   Widget build(BuildContext context){
@@ -222,38 +222,35 @@ class BloodSugarChart extends StatelessWidget{
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-            child: Column(
-               children: <Widget>[
-                  Text('Tvoj šećer'),
-                  Expanded(
-                    child:
-                    SfCartesianChart(
-                      primaryXAxis: DateTimeAxis(
-                        intervalType: DateTimeIntervalType.hours,
-                        minimum: DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day-1),
-                        maximum: DateTime.now(),
-                      ),
-                      palette:<Color> [Colors.teal],
-                      series: <ChartSeries<Sug, DateTime>>[
-                      LineSeries(
-                          dataSource: sugarData,
-                          markerSettings: MarkerSettings( isVisible : true),
-                          xValueMapper: (Sug values, _)=> values.date,
-                          yValueMapper: (Sug values, _)=> values.sugar_value,
-                          name: 'BloodSugar'
-                      ),
-                    ],
-                    ),
-
+          child: Column(
+            children: <Widget>[
+              Text('Tvoja masa'),
+              Expanded(
+                child:
+                SfCartesianChart(
+                  primaryXAxis: DateTimeAxis(
+                    intervalType: DateTimeIntervalType.hours,
+                    minimum: DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day-1),
+                    maximum: DateTime.now(),
                   ),
+                  palette:<Color> [Colors.teal],
+                  series: <ChartSeries<mass, DateTime>>[
+                    LineSeries(
+                        dataSource: massData,
+                        markerSettings: MarkerSettings( isVisible : true),
+                        xValueMapper: (mass values, _)=> values.date,
+                        yValueMapper: (mass values, _)=> values.mass_value,
+                        name: 'Mass'
+                    ),
+                  ],
+                ),
+
+              ),
             ],
-        ),
+          ),
         ),
       ),
     );
   }
 
 }
-
-
-

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:penzz/helpers/documents_database.dart';
 import 'package:penzz/helpers/storage.dart';
+import 'package:penzz/pages/blood_pressure_screen.dart';
+import 'package:penzz/pages/mass_values_screen.dart';
 
 import 'package:penzz/pages/settings_screen.dart';
 import 'package:penzz/pages/sugar_values_screen.dart';
@@ -132,7 +134,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 title: new Text('Tvoj krvni tlak'),
                 onTap: () async {
                   Navigator.pop(context);
-
+                  Navigator.pushNamed(context, BloodPressureScreen.id);
                 },
               ),
               ListTile(
@@ -145,9 +147,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
               ListTile(
                 leading: new Icon(Icons.accessibility_sharp),
-                title: new Text('Tvoj masa'),
+                title: new Text('Tvoja masa'),
                 onTap: () async {
                   Navigator.pop(context);
+                  Navigator.pushNamed(context, MassValuesScreen.id);
                 },
               ),
             ],
