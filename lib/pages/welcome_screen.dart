@@ -77,7 +77,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  SizedBox(height: 40,),
+                  SizedBox(height: 60,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -85,13 +85,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 250.0),
+                  const SizedBox(height: 10.0),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text('Odaberi radnju!', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, fontFamily: 'Poppins-SemiBold'), textAlign: TextAlign.right,),
+                      Text('Upravljaj svojim zdravljem', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, fontFamily: 'Poppins-SemiBold'), textAlign: TextAlign.right,),
                     ],
                   ),
+
+                  const SizedBox(height: 230.0),
+
                   Divider(color: Colors.black, thickness: 0.5, height: 5,),
                   BlackButton(
                     onPressed: ()  {

@@ -31,11 +31,10 @@ class _LoginScreenState extends State<LoginScreen> {
              crossAxisAlignment: CrossAxisAlignment.stretch,
              children: <Widget>[
                SizedBox(height: 40,),
-               Text('Dobrodošli', style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, fontFamily: 'Poppins-SemiBold'),),
+               Text('Dobro došli', style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, fontFamily: 'Poppins-SemiBold'),),
                Row(children: [
                  Text('natrag u',  style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, fontFamily: 'Poppins-SemiBold')),
                  SizedBox(width: 15,),
-                 Image.asset('images/arrowCircle.png', width: 40, height: 40,)
                ],),
                SizedBox(
                  height: 30.0,
