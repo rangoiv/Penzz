@@ -56,7 +56,7 @@ class _SaveSugarValueScreenState extends State<SaveSugarValueScreen>{
               onPressed: () async {
                 try{
                   Sug sugar=Sug(id: await Sugar.getNewId(), sugar_value: input_value, date: DateTime.now());
-                  if(sugar.sugar_value!=-1){
+                  if(sugar.sugar_value!=-1 && isNumeric(s)){
                     Sugar.insert(sugar);
                     Navigator.pop(context);
                   }
@@ -73,4 +73,11 @@ class _SaveSugarValueScreenState extends State<SaveSugarValueScreen>{
     );
   }
 
+}
+
+bool isNumeric(String s){
+  if(s == null) {
+    return false;
+  }
+  return double.tryParse(s) != null;
 }
